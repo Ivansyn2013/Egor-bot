@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram import Dispatcher
+from aiogram.dispatcher import Dispatcher
 import os
 
 
