@@ -6,3 +6,4 @@ venv
 .idea
 shell_scripts
 win_bot_start.bat
+log.txt
