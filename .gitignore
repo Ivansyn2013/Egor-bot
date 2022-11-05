@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+Lib
+Scripts
+pyvenv.cfg
+venv
+.idea
+shell_scripts
+win_bot_start.bat
