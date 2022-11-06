@@ -9,6 +9,7 @@ from handlers import cliet_part, admin, other
 
 cliet_part.register_handlers_client(dp)
 
+admin.register_handlers_admin(dp)
 #пустой хендлер должен быть последним
 #other.register_handlers_other(dp)
 

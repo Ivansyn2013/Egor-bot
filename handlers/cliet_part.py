@@ -48,7 +48,7 @@ async def echo_send(message: types.Message):
 dp.register_message_handler(command_start, commands=['start', 'help'])
 dp.register_message_handler(command_author, commands=['Авторизация'])
 dp.register_message_handler(command_search, commands=['Поиск'])
-dp.register_message_handler(test_mes)
+#dp.register_message_handler(test_mes)
 
 # не знаю нужно ли так
 def register_handlers_client(dp: Dispatcher):
