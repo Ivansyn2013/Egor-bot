@@ -5,6 +5,8 @@ from create_obj import bot, dp
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
 from keybords import admin_kb
+from sql_bd import sql_add_command
+
 
 ID = None
 
@@ -17,12 +19,13 @@ class FSMAdmin(StatesGroup):
 
 
 # хендлер для админа
-# @dp.message_hendler(commands=["moderator"],is_chat_admin=True)
+# @dp.message_hendler(commands=["moderator"],is_chat_admin=True `указание на модератора
+# группы`)
 async def make_changes_command(message: types.Message):
     print('moderator on')
     global ID
     ID = message.from_user.id
-    await bot.send_message(message.from_user.id, 'Изменение базы данных', \
+    await bot.send_message(message.from_user.id, 'Изменение базы данных',
                            reply_markup=admin_kb.button_case_admin)
     await message.delete()
 
@@ -62,18 +65,20 @@ async def load_description(message: types.Message, state: FSMContext):
 # @dp.message_handler(state=FSMAdmin.price)
 async def load_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['price'] = float(message.text)
+        data['price'] = message.text
 
-    async with state.proxy() as data:
-        await message.reply(str(data))
-        await message.answer('Готово')
+    #async with state.proxy() as data:
+        # await message.reply(str(data))
+        # await message.answer('Готово')
+    # запись в базу
+    await sql_add_command(state)
     # вызод из машинных состояний
     await state.finish()
 
 
 # отмена машинного состояния
-@dp.message_handler(state="*", commands='отмена')
-@dp.message_handler(Text(equals='отмена', ignore_case=True), state="*")
+# @dp.message_handler(state="*", commands='отмена')
+# @dp.message_handler(Text(equals='отмена', ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
@@ -83,8 +88,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 
 dp.register_message_handler(make_changes_command, commands='moderator')
-
-dp.register_message_handler(cm_start, commands='Загрузить', state=None)
+dp.register_message_handler(cm_start, commands=['Загрузить','Load'], state=None)
 dp.register_message_handler(load_description, state=FSMAdmin.description)
 dp.register_message_handler(load_name, state=FSMAdmin.name)
 dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
@@ -93,8 +97,11 @@ dp.register_message_handler(load_price, state=FSMAdmin.price)
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(make_changes_command, commands='moderator')
-    dp.register_message_handler(cm_start, commands='Загрузить', state=None)
+    dp.register_message_handler(cm_start, commands=['Загрузить','Load'], state=None)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_name, state=FSMAdmin.price)
     dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
     dp.register_message_handler(load_price, state=FSMAdmin.price)
+    dp.register_message_handler(cancel_handler, Text(equals='отмена',
+                                                     ignore_case=True), state="*")
+    dp.register_message_handler(cancel_handler, state="*", commands='отмена')
