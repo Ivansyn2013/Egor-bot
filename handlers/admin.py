@@ -3,6 +3,10 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
 from create_obj import bot, dp
 from aiogram import Dispatcher
+from aiogram.dispatcher.filters import Text
+from keybords import admin_kb
+
+ID = None
 
 
 class FSMAdmin(StatesGroup):
@@ -12,14 +16,25 @@ class FSMAdmin(StatesGroup):
     price = State()
 
 
-#@dp.message_handler(commands='Загрузить', state=None)
+# хендлер для админа
+# @dp.message_hendler(commands=["moderator"],is_chat_admin=True)
+async def make_changes_command(message: types.Message):
+    print('moderator on')
+    global ID
+    ID = message.from_user.id
+    await bot.send_message(message.from_user.id, 'Изменение базы данных', \
+                           reply_markup=admin_kb.button_case_admin)
+    await message.delete()
+
+
+# @dp.message_handler(commands='Загрузить', state=None)
 async def cm_start(message: types.Message):
     await FSMAdmin.photo.set()
     await message.reply('Загрузи фото')
 
 
 # обработка ответа пользователя
-#@dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
+# @dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def load_photo(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['photo'] = message.photo[0].file_id
@@ -28,7 +43,7 @@ async def load_photo(message: types.Message, state: FSMContext):
 
 
 # next FAM answer
-#@dp.message_handler(state=FSMAdmin.name)
+# @dp.message_handler(state=FSMAdmin.name)
 async def load_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
@@ -36,7 +51,7 @@ async def load_name(message: types.Message, state: FSMContext):
     await message.reply('Введи описание')
 
 
-#@dp.message_handler(state=FSMAdmin.description)
+# @dp.message_handler(state=FSMAdmin.description)
 async def load_description(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['description'] = message.text
@@ -44,7 +59,7 @@ async def load_description(message: types.Message, state: FSMContext):
     await message.reply('Укажи цену')
 
 
-#@dp.message_handler(state=FSMAdmin.price)
+# @dp.message_handler(state=FSMAdmin.price)
 async def load_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['price'] = float(message.text)
@@ -52,10 +67,11 @@ async def load_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         await message.reply(str(data))
         await message.answer('Готово')
-    #вызод из машинных состояний
+    # вызод из машинных состояний
     await state.finish()
 
-#отмена машинного состояния
+
+# отмена машинного состояния
 @dp.message_handler(state="*", commands='отмена')
 @dp.message_handler(Text(equals='отмена', ignore_case=True), state="*")
 async def cancel_handler(message: types.Message, state: FSMContext):
@@ -63,9 +79,10 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     if current_state is None:
         return
     await state.finish()
-    await message.reply('ok')
+    await message.reply('Команда отмены: ok')
 
 
+dp.register_message_handler(make_changes_command, commands='moderator')
 
 dp.register_message_handler(cm_start, commands='Загрузить', state=None)
 dp.register_message_handler(load_description, state=FSMAdmin.description)
@@ -75,6 +92,7 @@ dp.register_message_handler(load_price, state=FSMAdmin.price)
 
 
 def register_handlers_admin(dp: Dispatcher):
+    dp.register_message_handler(make_changes_command, commands='moderator')
     dp.register_message_handler(cm_start, commands='Загрузить', state=None)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_name, state=FSMAdmin.price)
