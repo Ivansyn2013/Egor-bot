@@ -1,8 +1,7 @@
 import sqlalchemy as sql
 connecting_string = (
-    r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
-    r'DBQ=C:\Users\Александр\PycharmProjects\Egor-bot\acces_reader\FODMAP DB совсем '
-    r'финал.accdb'
+    r'DRIVER={MDBTools};'
+    r'DBQ=1.accdb;'
     r'ExtendedAnsiSQL=1;'
 )
 
