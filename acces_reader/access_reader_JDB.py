@@ -12,7 +12,7 @@ if __name__ == '__main__':
         "/UCanAccess-5.0.1.bin/lib/jackcess-3.0.1.jar",
     ]
 
-
+#дальше не сомтрел
 classpath = ":".join(ucanaccess_jars)
 cnxn = jaydebeapi.connect(
     "net.ucanaccess.jdbc.UcanaccessDriver",
@@ -26,3 +26,8 @@ try:
     cnxn.commit()
 except jaydebeapi.DatabaseError as de:
     print(de)
+
+
+
+
+#https://stackoverflow.com/questions/13473149/pdo-how-to-access-microsoft-access-file-on-linux
