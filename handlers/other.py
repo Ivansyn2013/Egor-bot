@@ -4,7 +4,7 @@ import string
 from aiogram import types
 from aiogram.dispatcher import Dispatcher
 
-from create_obj import dp, bot
+from create_obj import  bot
 from keybords import kb_client
 
 
@@ -41,7 +41,7 @@ async def test_mes(message: types.Message):
 #     await message.reply(message.text)
 #     await bot.send_message(message.from_user.id, message.text)
 
-dp.register_message_handler(test_mes)
+#dp.register_message_handler(test_mes)
 
 def register_handlers_other(dp: Dispatcher):
     # dp.register_message_handler(echo_send)

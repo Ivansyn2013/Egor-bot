@@ -1,9 +1,8 @@
 from contextlib import contextmanager
 
 import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker
-
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
@@ -62,14 +61,12 @@ class Question(Base):
     # JOIN вместо LEFT JOIN
 
 
-
-
 import os
 
 BD_PASS = os.getenv('BD_PASS')
 
 connect_url = fr'mysql+asyncmy://test:{BD_PASS}@192.168.0.110:3300/egor_db' \
-               r'?charset=utf8mb4'
+              r'?charset=utf8mb4'
 
 engine = sa.create_engine(connect_url, echo=True)
 
@@ -94,13 +91,12 @@ def session_scope():
     finally:
         session.close()
 
+
 if __name__ == '__main__':
     with session_scope() as s:
         questions = s.query(Question).filter(
             Question.Common == 3,
         ).order_by(Question.id.desc()).limit(10).all()
-
-
 
 #
 # def use_inspector(conn):

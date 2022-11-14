@@ -1,12 +1,12 @@
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram import types
-from create_obj import bot, dp
 from aiogram import Dispatcher
+from aiogram import types
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters.state import State, StatesGroup
+
+from create_obj import bot
 from keybords import admin_kb
 from sql_bd import sql_add_command
-
 
 ID = None
 
@@ -87,12 +87,12 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Команда отмены: ok')
 
 
-dp.register_message_handler(make_changes_command, commands='moderator')
-dp.register_message_handler(cm_start, commands=['Загрузить','Load'], state=None)
-dp.register_message_handler(load_description, state=FSMAdmin.description)
-dp.register_message_handler(load_name, state=FSMAdmin.name)
-dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
-dp.register_message_handler(load_price, state=FSMAdmin.price)
+# dp.register_message_handler(make_changes_command, commands='moderator')
+# dp.register_message_handler(cm_start, commands=['Загрузить','Load'], state=None)
+# dp.register_message_handler(load_description, state=FSMAdmin.description)
+# dp.register_message_handler(load_name, state=FSMAdmin.name)
+# dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
+# dp.register_message_handler(load_price, state=FSMAdmin.price)
 
 
 def register_handlers_admin(dp: Dispatcher):

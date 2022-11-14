@@ -7,7 +7,7 @@ from sql_bd import sql_start
 
 async def on_startup(_):
     print('Бот загрузился')
-    sql_start()
+    sql_start() #sqllite база
 
 
 from handlers import cliet_part, admin, other

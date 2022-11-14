@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram import Dispatcher
-from create_obj import bot, dp
+from create_obj import bot
 from keybords import kb_client
 from sql_bd import sql_read
 
@@ -33,10 +33,10 @@ async def command_show(message: types.Message):
 
 
 # не знаю почему, но так работает, во всяком случае на python 3.7 и на 10 тоже
-dp.register_message_handler(command_start, commands=['start', 'help'])
-dp.register_message_handler(command_author, commands=['Авторизация'])
-dp.register_message_handler(command_search, commands=['Поиск'])
-dp.register_message_handler(command_show, commands='Show')
+# dp.register_message_handler(command_start, commands=['start', 'help'])
+# dp.register_message_handler(command_author, commands=['Авторизация'])
+# dp.register_message_handler(command_search, commands=['Поиск'])
+# dp.register_message_handler(command_show, commands='Show')
 #dp.register_message_handler(test_mes)
 
 # не знаю нужно ли так
