@@ -3,7 +3,10 @@ import os
 from mysql.connector import connect, Error
 
 
-def db_mysql_request(request):
+def db_mysql_request(request: str):
+    '''Function connecting to mysql db and return dict with value or None if seach
+    result is empty or raise an Error'''
+
     BD_PASS = os.getenv('BD_PASS')
     # print(BD_PASS)
     try:
@@ -25,12 +28,15 @@ def db_mysql_request(request):
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
                 req_all = cr.fetchall()
+                if not req_all:
+                    return None
+
                 firts_list = [[] for x in range(len(req_all[0]))]
                 for y in range(len(req_all)):
                     for x in range(len(req_all[y])):
                         firts_list[x].append(req_all[y][x])
                 # return cr.fetchall()
-                return dict(zip(cr.column_names,firts_list))
+                return dict(zip(cr.column_names, firts_list))
 
     except Error as e:
         print('Это ошибка', end='')
@@ -40,6 +46,6 @@ def db_mysql_request(request):
 
 if __name__ == '__main__':
     res = db_mysql_request('Перловка')
-    #print(res)
+    # print(res)
     print(res.keys())
     print(res['Фруктаны'])

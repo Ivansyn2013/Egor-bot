@@ -67,9 +67,9 @@ async def load_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['price'] = message.text
 
-    #async with state.proxy() as data:
-        # await message.reply(str(data))
-        # await message.answer('Готово')
+    # async with state.proxy() as data:
+    # await message.reply(str(data))
+    # await message.answer('Готово')
     # запись в базу
     await sql_add_command(state)
     # вызод из машинных состояний
@@ -97,7 +97,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(make_changes_command, commands='moderator')
-    dp.register_message_handler(cm_start, commands=['Загрузить','Load'], state=None)
+    dp.register_message_handler(cm_start, commands=['Загрузить', 'Load'], state=None)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_name, state=FSMAdmin.price)
     dp.register_message_handler(load_photo, content_types=['photo'], state=FSMAdmin.photo)
