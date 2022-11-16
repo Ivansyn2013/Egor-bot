@@ -1,17 +1,27 @@
+import io
+
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from PIL import Image, ImageFile
 
+from io import BytesIO
 from create_obj import bot
 from keybords import kb_search, kb_client
 from sql_bd import sql_read
 from acces_reader import db_mysql_request
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class FSMSearch(StatesGroup):
     fs_search = State()
 
+
+def png_convert(img):
+    with BytesIO() as f:
+        img.save(f, format='JPEG')
+        return f.getvalue()
 
 # @dp.message_handler(commands=['start', 'help'])
 async def command_start(message: types.Message):
@@ -47,19 +57,31 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                                'Ищу')
         if res is None:
             await bot.send_message(message.from_user.id,
-                                   'НИчего не нашел')
-            await FSMSearch.first()
-        # with open('bite_srt.txt','wb') as f:
-        #     f.write(res['Картинка'][0])
-        res.pop('Картинка')
-        await bot.send_message(message.from_user.id,
-                             f'{res["Порция"][0]}')
-        await FSMSearch.first()
+                                   'Ничего не нашел')
+
+
+        image_data = res['image'][0]
+        #image = Image.open(io.BytesIO(image_data))
+
+        print(res.keys())
+
+        await message.delete()
+
+        await bot.send_photo(message.from_user.id,
+                             image_data,
+                             f'{res["Название продукта"][0]}\n'
+                             f'{res["Цвет"][0]}{res["high low medium"]}'
+                             f'{res["Цвет"][0]}\n'
+                             f'{res["Доза"]}\n'
+                             f'Фруктоза {res["Цвет"]} {res["Фруктаны"]}\n'
+                             f'{res["Порция"]}')
+        await state.finish()
 
 
 async def cancel_search_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
+        print('Команда отмены возврат')
         return
     await state.finish()
     await message.reply('Команда отмены: ok')

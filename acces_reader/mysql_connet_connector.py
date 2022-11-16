@@ -1,7 +1,8 @@
 import os
-
+from PIL import Image
+import io
 from mysql.connector import connect, Error
-
+import pickle
 
 def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
@@ -22,8 +23,10 @@ def db_mysql_request(request: str):
             request = request.replace("\'", '')
             select_req_string = fr'SELECT * FROM Common ' \
                                 fr'JOIN dose ON Common.id = dose.common_id ' \
-                                fr'JOIN fodmap ON Common.fodmap_id=fodmap.id ' \
+                                fr'JOIN fodmap ON Common.fodmap_id = fodmap.id ' \
                                 fr'JOIN Color ON dose.color_id = Color.id ' \
+                                fr'JOIN jpeg_images ON jpeg_images.common_id =' \
+                                fr'Common.id ' \
                                 fr"WHERE `Название продукта` = '{request}'"
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
@@ -49,3 +52,12 @@ if __name__ == '__main__':
     # print(res)
     print(res.keys())
     print(res['Фруктаны'])
+    #print(res['Картинка'][0])
+    image_data = res['image'][0]
+    print(len(image_data))
+    print(type(image_data))
+    image = Image.open(io.BytesIO(image_data))
+    image.show()
+    # with open('tmp2.jpg', 'wb') as f:
+    #     f.save(image_data)
+
