@@ -3,6 +3,8 @@ from PIL import Image
 import io
 from mysql.connector import connect, Error
 import pickle
+from features import one_srt_answer, get_answer_str
+
 
 def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
@@ -28,9 +30,13 @@ def db_mysql_request(request: str):
                                 fr'JOIN jpeg_images ON jpeg_images.common_id =' \
                                 fr'Common.id ' \
                                 fr"WHERE `Название продукта` = '{request}'"
+
+            display_answer = fr'SELECT `Отображение`FROM Color'
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
+                #это кортеж из табличных строк
                 req_all = cr.fetchall()
+
                 if not req_all:
                     return None
 
@@ -39,7 +45,12 @@ def db_mysql_request(request: str):
                     for x in range(len(req_all[y])):
                         firts_list[x].append(req_all[y][x])
                 # return cr.fetchall()
-                return dict(zip(cr.column_names, firts_list))
+                str_dict = dict(zip(cr.column_names, firts_list))
+
+                cr.execute(display_answer)
+                display = cr.fetchall()
+                str_dict['Отображение'] = display
+                return  str_dict
 
     except Error as e:
         print('Это ошибка', end='')
@@ -47,17 +58,56 @@ def db_mysql_request(request: str):
         return None
 
 
+async def db_mysql_all_products():
+    request = 'SELECT `Название продукта` FROM Common'
+    BD_PASS = os.getenv('BD_PASS')
+    try:
+        with connect(
+                host='192.168.0.110',
+                port=3300,
+                user='test',
+                password=BD_PASS,
+                database='egor_db'
+        ) as connection:
+            print('Соединение с базой из all_produts')
+            with connection.cursor() as cr:
+                cr.execute(request)
+                answer_row = cr.fetchall()
+                if answer_row is None:
+                    return  None
+                else:
+                    return list(map(lambda x: str(x[0]), answer_row))
+
+    except Error as e:
+        print('Это ошибка из all+products')
+        print(e)
+        return None
+
+
 if __name__ == '__main__':
     res = db_mysql_request('Перловка')
-    # print(res)
-    print(res.keys())
-    print(res['Фруктаны'])
-    #print(res['Картинка'][0])
-    image_data = res['image'][0]
-    print(len(image_data))
-    print(type(image_data))
-    image = Image.open(io.BytesIO(image_data))
-    image.show()
+    #print(res)
+   # print(res.keys())
+    #print(res['Отображение'])
+
+    res.pop('image')
+    res.pop('Картинка')
+    print(res.items())
+    #image_data = res['image'][0]
+    #print(len(image_data))
+    #print(type(image_data))
+    #image = Image.open(io.BytesIO(image_data))
+    #image.show()
     # with open('tmp2.jpg', 'wb') as f:
     #     f.save(image_data)
+    #print(res["Отображение"][res["Фруктаны"]])
+    #print(res["Отображение"][res["Фруктаны"][1]])
+    #print(res["Отображение"][res["Фруктаны"][2]])
 
+
+    # for inx in range(len(list(res.values())[0])):
+    #     print('*'*100)
+    #     print(f'индекс{inx}')
+    #     print(one_srt_answer(res,inx))
+
+    print(get_answer_str(res))
