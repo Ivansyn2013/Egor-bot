@@ -4,6 +4,7 @@ import io
 from mysql.connector import connect, Error
 import pickle
 from features import one_srt_answer, get_answer_str
+import asyncio
 
 
 def db_mysql_request(request: str):
@@ -34,7 +35,7 @@ def db_mysql_request(request: str):
             display_answer = fr'SELECT `Отображение`FROM Color'
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
-                #это кортеж из табличных строк
+                # это кортеж из табличных строк
                 req_all = cr.fetchall()
 
                 if not req_all:
@@ -50,7 +51,7 @@ def db_mysql_request(request: str):
                 cr.execute(display_answer)
                 display = cr.fetchall()
                 str_dict['Отображение'] = display
-                return  str_dict
+                return str_dict
 
     except Error as e:
         print('Это ошибка', end='')
@@ -58,8 +59,8 @@ def db_mysql_request(request: str):
         return None
 
 
-async def db_mysql_all_products():
-    request = 'SELECT `Название продукта` FROM Common'
+async def db_mysql_all_products() -> dict:
+    request = r'SELECT `id`, `Название продукта` FROM Common'
     BD_PASS = os.getenv('BD_PASS')
     try:
         with connect(
@@ -74,9 +75,9 @@ async def db_mysql_all_products():
                 cr.execute(request)
                 answer_row = cr.fetchall()
                 if answer_row is None:
-                    return  None
+                    return None
                 else:
-                    return list(map(lambda x: str(x[0]), answer_row))
+                    return {x: y for y, x in answer_row}
 
     except Error as e:
         print('Это ошибка из all+products')
@@ -86,28 +87,28 @@ async def db_mysql_all_products():
 
 if __name__ == '__main__':
     res = db_mysql_request('Перловка')
-    #print(res)
-   # print(res.keys())
-    #print(res['Отображение'])
+    # print(res)
+    # print(res.keys())
+    # print(res['Отображение'])
 
     res.pop('image')
     res.pop('Картинка')
     print(res.items())
-    #image_data = res['image'][0]
-    #print(len(image_data))
-    #print(type(image_data))
-    #image = Image.open(io.BytesIO(image_data))
-    #image.show()
+    # image_data = res['image'][0]
+    # print(len(image_data))
+    # print(type(image_data))
+    # image = Image.open(io.BytesIO(image_data))
+    # image.show()
     # with open('tmp2.jpg', 'wb') as f:
     #     f.save(image_data)
-    #print(res["Отображение"][res["Фруктаны"]])
-    #print(res["Отображение"][res["Фруктаны"][1]])
-    #print(res["Отображение"][res["Фруктаны"][2]])
-
+    # print(res["Отображение"][res["Фруктаны"]])
+    # print(res["Отображение"][res["Фруктаны"][1]])
+    # print(res["Отображение"][res["Фруктаны"][2]])
 
     # for inx in range(len(list(res.values())[0])):
     #     print('*'*100)
     #     print(f'индекс{inx}')
     #     print(one_srt_answer(res,inx))
-
-    print(get_answer_str(res))
+    print(db_mysql_all_products())
+    res = db_mysql_all_products()
+    print(list(res.keys()))
