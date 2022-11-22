@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import uuid
 from aiogram.utils.callback_data import CallbackData
 
-cd_data = CallbackData('button', 'id', 'bd_id', 'action')
+cd_data = CallbackData('button', 'id', 'bd_id', 'action','kb_number')
 
 
 async def inline_button_gen(search_dict_ready: dict):
@@ -11,7 +11,7 @@ async def inline_button_gen(search_dict_ready: dict):
 
     global cd_data
 
-    inline_but_kb = InlineKeyboardMarkup(row_width=3, resize_keybasrd=True)
+    inline_but_kb = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
     sl = search_dict_ready
 
     for name, id in sl.items():
@@ -20,6 +20,7 @@ async def inline_button_gen(search_dict_ready: dict):
                                      id=str(uuid.uuid4()),
                                      action='search',
                                      bd_id=id,
+                                     kb_number='s_s'
                                  ),
                                  )
         inline_but_kb.add(b)

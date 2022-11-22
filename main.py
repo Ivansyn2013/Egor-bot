@@ -3,11 +3,16 @@ from aiogram.utils import executor
 
 from create_obj import dp, bot
 from sql_bd import sql_start
+from inline_butn import get_product_list_kb
+from acces_reader import db_mysql_all_products
+
+
 
 
 async def on_startup(_):
     print('Бот загрузился')
     sql_start() #sqllite база
+    global kb_list
 
 
 from handlers import cliet_part, admin, other
