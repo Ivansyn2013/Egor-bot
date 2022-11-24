@@ -1,13 +1,13 @@
 from difflib import get_close_matches
-from io import BytesIO
-import typing
 from PIL import ImageFile
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from inline_butn.search_inline_but import inline_buttons_gen_category
 
-from acces_reader import db_mysql_request, db_mysql_all_products
+from acces_reader import db_mysql_request, db_mysql_all_products, \
+    db_mysql_category_request
 from create_obj import bot
 from features import get_answer_str
 from inline_butn import inline_button_gen
@@ -53,6 +53,42 @@ async def start_searching(message: types.Message):
                         reply_markup=kb_search)
 
 
+# поиск по категориям
+async def start_category_search(message: types.Message):
+    await message.reply('Категории продуктов',
+                        reply_markup=await inline_buttons_gen_category())
+
+
+async def callback_category(query: types.CallbackQuery,
+                            callback_data: typing.Dict[str, str]):
+    global kb_list
+
+    dict_for_kb = {}
+    for but in query.message.reply_markup.inline_keyboard:
+        for context in but:
+            if query.data == context["callback_data"]:
+                category_product_in = context.text
+
+    category_poducts_all = await db_mysql_category_request()
+
+    print(category_poducts_all)
+
+    all_products = await db_mysql_all_products()
+    for name, id in all_products.items():
+        if id in category_poducts_all[category_product_in]:
+            dict_for_kb.update([(name, id)])
+
+    print(dict_for_kb)
+
+    kb_list = await get_product_list_kb(dict_for_kb)
+
+    print(len(kb_list))
+
+    await query.answer()
+    await query.message.edit_text(f'{context.text}',
+                                  reply_markup=kb_list[0])
+
+
 async def search_go_to_db(message: types.Message, state=FSMContext):
     async with state.proxy() as data:
         data['search_text'] = message.text
@@ -65,6 +101,7 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
             await bot.send_message(message.from_user.id,
                                    'То что Вы искали, я не нашел, но может быть Вам '
                                    'подойдет что-то из этого:')
+
             await FSMSearch.option_search.set()
             print(await state.get_state())
             # await search_options_db(message,FSMSearch.option_search)
@@ -202,7 +239,7 @@ async def product_list_callback_next(query: types.CallbackQuery,
                                      callback_data: typing.Dict[str, str]):
     print(callback_data['kb_number'])
     kb_number = int(callback_data['kb_number']) - 1
-    if kb_number > len(kb_list) - 1:
+    if kb_number >= len(kb_list) - 1:
         await  query.answer()
     else:
         await query.answer()
@@ -244,6 +281,8 @@ def register_handlers_client(dp: Dispatcher):
                                 state='*')
     dp.register_message_handler(cancel_search_handler, Text(equals='отмена',
                                                             ignore_case=True), state="*")
+    dp.register_message_handler(start_category_search, commands=['Категории_продуктов'])
+
     dp.register_callback_query_handler(search_callback,
                                        cd_data.filter(action='search'),
                                        state=FSMSearch.callback_search_state)
@@ -256,3 +295,5 @@ def register_handlers_client(dp: Dispatcher):
                                        cd_data.filter(action='back'))
     dp.register_callback_query_handler(product_list_enter,
                                        cd_data.filter(action='search_in'))
+    dp.register_callback_query_handler(callback_category,
+                                       cd_data.filter(action='category'))

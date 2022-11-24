@@ -9,6 +9,11 @@ cd_data = CallbackData('button', 'id', 'bd_id', 'action', 'kb_number')
 
 
 async def get_product_list_kb(all_product_dict: dict) -> types.InlineKeyboardButton:
+    '''
+
+    :param all_product_dict:dict with product name: product id from db
+    :return:inline_kb
+    '''
     global cd_data
 
     test = []

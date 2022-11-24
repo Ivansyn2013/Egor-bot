@@ -1,2 +1,3 @@
 from acces_reader.mysql_connet_connector import db_mysql_request
 from acces_reader.mysql_connet_connector import db_mysql_all_products
+from acces_reader.mysql_connet_connector import db_mysql_category_request

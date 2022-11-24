@@ -74,6 +74,7 @@ async def db_mysql_all_products() -> dict:
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
+
                 if answer_row is None:
                     return None
                 else:
@@ -81,6 +82,48 @@ async def db_mysql_all_products() -> dict:
 
     except Error as e:
         print('Это ошибка из all+products')
+        print(e)
+        return None
+
+
+async def db_mysql_category_request() -> dict:
+    """
+    connecting with db immutabel request
+    :return: dict with category and id of products
+    """
+
+    request = fr'SELECT Common.`id`, Category.`Название категории продукта` ' \
+              fr'FROM Category, Common ' \
+              fr'WHERE Category.`id` = Common.`product_cat_id`'
+    BD_PASS = os.getenv('BD_PASS')
+    answer_dict = {}
+    try:
+        with connect(
+                host='192.168.0.110',
+                port=3300,
+                user='test',
+                password=BD_PASS,
+                database='egor_db'
+        ) as connection:
+            print('Соединение с базой из category_products')
+            with connection.cursor() as cr:
+                cr.execute(request)
+                answer_row = cr.fetchall()
+                #print(answer_row)
+                if answer_row is None:
+                    return None
+                else:
+                    for id, name in answer_row:
+                        if name in answer_dict.keys():
+                            answer_dict[name].append(id)
+                        else:
+                            answer_dict[name] = [id]
+
+                    #print(answer_dict)
+                    return answer_dict
+
+    except Error as e:
+        print('Это ошибка из category_products')
         print(e)
         return None
 
