@@ -35,10 +35,11 @@ async def inline_buttons_gen_category() -> InlineKeyboardMarkup:
     global cd_data
 
     c_d = await db_mysql_category_request()
+
     if c_d is None:
         return None
 
-    inline_but_kb = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+    inline_but_kb = InlineKeyboardMarkup(row_width=1, resize_keyboard=True)
     buttons_list = []
 
     for name, id in c_d.items():

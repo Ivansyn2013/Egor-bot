@@ -69,16 +69,22 @@ async def callback_category(query: types.CallbackQuery,
             if query.data == context["callback_data"]:
                 category_product_in = context.text
 
-    category_poducts_all = await db_mysql_category_request()
 
-    print(category_poducts_all)
+    category_poducts_all = await db_mysql_category_request()
 
     all_products = await db_mysql_all_products()
     for name, id in all_products.items():
-        if id in category_poducts_all[category_product_in]:
-            dict_for_kb.update([(name, id)])
+        for category_name in category_poducts_all.keys():
+            category_name_red = str(category_name).replace('\t','')
+            category_product_in = category_product_in.lstrip()
+            if category_name_red ==  category_product_in:
+                if id in category_poducts_all[category_name]:
+                    dict_for_kb.update([(name, id)])
+                #else:
+                    #print('Ошибка в получение значений ключа словаря категорий')
 
-    print(dict_for_kb)
+    #print(dict_for_kb)
+
 
     kb_list = await get_product_list_kb(dict_for_kb)
 

@@ -32,32 +32,37 @@ async def get_product_list_kb(all_product_dict: dict) -> types.InlineKeyboardBut
                                  ),
                                  )
         but_list.append(b)
-    start=0
-    for index in range(14,len(but_list),14):
-        inline_but_kb.add(*but_list[start:index])
 
-        inline_but_kb.row(InlineKeyboardButton(text='Назад',
-                                               callback_data=cd_data.new(
-                                                   id=str(uuid.uuid4()),
-                                                   action='back',
-                                                   bd_id=id,
-                                                   kb_number=index // 14,
-                                               )
-                                               ),
-                          InlineKeyboardButton(text='Вперед',
-                                               callback_data=cd_data.new(
-                                                   id=str(uuid.uuid4()),
-                                                   action='next',
-                                                   bd_id=id,
-                                                   kb_number=index // 14,
-                                               )
-                                               ))
-        test.append(index // 14)
-        start = index
+    if len(but_list)>15:
+        start=0
+        for index in range(14,len(but_list),14):
+            inline_but_kb.add(*but_list[start:index])
+
+            inline_but_kb.row(InlineKeyboardButton(text='Назад',
+                                                   callback_data=cd_data.new(
+                                                       id=str(uuid.uuid4()),
+                                                       action='back',
+                                                       bd_id=id,
+                                                       kb_number=index // 14,
+                                                   )
+                                                   ),
+                              InlineKeyboardButton(text='Вперед',
+                                                   callback_data=cd_data.new(
+                                                       id=str(uuid.uuid4()),
+                                                       action='next',
+                                                       bd_id=id,
+                                                       kb_number=index // 14,
+                                                   )
+                                                   ))
+            test.append(index // 14)
+            start = index
+            kb_list.append(inline_but_kb)
+            inline_but_kb = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+    else:
+        inline_but_kb.add(*but_list)
         kb_list.append(inline_but_kb)
-        inline_but_kb = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
-    print(test)
-    print(len(kb_list))
+    #print(test)
+    #print(len(kb_list))
     return kb_list
 
 
