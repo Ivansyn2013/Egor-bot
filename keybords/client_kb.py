@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
 #создание клавиатуры с кнопками
-b1 =KeyboardButton('/Старт')
+b1 =KeyboardButton('Узнать о боте')
 b2 =KeyboardButton('/Поиск')
 b3 =KeyboardButton('/Категории_продуктов')
 b4 = KeyboardButton('/Список_продуктов')
