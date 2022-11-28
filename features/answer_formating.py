@@ -28,11 +28,11 @@ def get_answer_str(response: dict):
         return None
     elif 4 > len(r['Доза']) > 0 :
         for inx in range(len(list(r.values())[0])):
-            answer = f'{answer}{dose_str[inx]} {one_srt_answer(r,inx)}\n '
-            if r["Примечание"][0] is not None:
-                answer = answer + f'{r["Примечание"][0]}'
+            answer = f'<code>{answer}{dose_str[inx]} {one_srt_answer(r,inx)}\n </code>'
+        if r["Примечание"][0] is not None:
+            answer = answer + f'<i>{r["Примечание"][0]}</i>'
 
-        return answer
+        return f'{answer}'
     else:
         raise Exception(f'Ошибка получения ответа запроса, неправльная длинна: {len(r)}')
         return None

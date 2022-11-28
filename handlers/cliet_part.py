@@ -53,6 +53,9 @@ async def start_searching(message: types.Message):
                         reply_markup=kb_search)
 
 
+async def search_function(message):
+    await bot.send_message(message.from_user.id,'Hi')
+
 # поиск по категориям
 async def start_category_search(message: types.Message):
     await message.reply('Категории продуктов',
@@ -111,6 +114,17 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
             await FSMSearch.option_search.set()
             print(await state.get_state())
             # await search_options_db(message,FSMSearch.option_search)
+
+
+
+
+
+
+
+
+
+
+
         else:
             image_data = res['image'][0]
 
@@ -124,12 +138,12 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
 
             await bot.send_photo(message.from_user.id,
                                  image_data,
-                                 f'<code>{get_answer_str(res)}</code>',
+                                 f'{get_answer_str(res)}',
                                  parse_mode='html'
                                  )
             await FSMSearch.fs_search.set()
-
-
+##################################
+### эту функцию вставить в предыдущую
 async def search_options_db(message: types.Message, state=FSMSearch.option_search):
     async with state.proxy() as data:
         await bot.send_message(message.from_user.id, f'{data["search_text"]}')
@@ -148,7 +162,7 @@ async def search_options_db(message: types.Message, state=FSMSearch.option_searc
                                reply_markup=await inline_button_gen(search_dict_ready))
         await FSMSearch.callback_search_state.set()
 
-
+#######################################################
 async def search_callback(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
                           state=FSMSearch.callback_search_state):
@@ -174,7 +188,7 @@ async def search_callback(query: types.CallbackQuery,
         await bot.send_photo(
             query.from_user.id,
             image_data,
-            f'<code>{get_answer_str(res)}</code>',
+            f'{get_answer_str(res)}',
             parse_mode='html'
         )
         await state.finish()
@@ -234,7 +248,7 @@ async def product_list_enter(query: types.CallbackQuery,
         await bot.send_photo(
             query.from_user.id,
             image_data,
-            f'<code>{get_answer_str(res)}</code>',
+            f'{get_answer_str(res)}',
             parse_mode='html'
         )
         await query.answer()
