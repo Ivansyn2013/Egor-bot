@@ -30,7 +30,7 @@ async def answer_and_qusetion(message: types.Message):
     if message.text in STR_ANSWER_AND_QUESTION.keys():
         await message.reply(f'{STR_ANSWER_AND_QUESTION[message.text]}',
                             reply_markup=kb_answer_and_qusetion,
-                            )
+                            parse_mode='html')
 
 
 
