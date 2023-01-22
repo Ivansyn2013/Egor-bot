@@ -2,28 +2,32 @@ import os
 
 from mysql.connector import connect, Error
 from dotenv import load_dotenv
+load_dotenv()
 
+DEBUG = os.getenv('DEBUG')
+BD_PASS = os.getenv('DB_PASS')
+DB_PORT = os.getenv('DB_PORT')
+DB_USER = os.getenv('DB_USER')
+MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
 
+if DEBUG != False:
+    DB_HOST = '192.168.0.202'
+else:
+    DB_HOST = os.getenv('DB_HOST')
 
 def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
     result is empty or raise an Error'''
 
-    load_dotenv()
-    DEBUG = os.getenv('DEBUG')
-
-    if DEBUG:
-        DB_HOST = '192.168.0.202'
-
-    BD_PASS = os.getenv('BD_PASS')
-    # print(BD_PASS)
+    print(BD_PASS)
+    print(DB_HOST)
     try:
         with connect(
                 host=DB_HOST,
-                port=3300,
-                user='test',
+                port=DB_PORT,
+                user=DB_USER,
                 password=BD_PASS,
-                database='egor_db'
+                database=MYSQL_DATABASE,
         ) as connection:
             print(connection)
             print("Соединение с базой")
@@ -65,21 +69,15 @@ def db_mysql_request(request: str):
 
 async def db_mysql_all_products() -> dict:
     request = r'SELECT `id`, `Название продукта` FROM Common'
-    load_dotenv()
-    DEBUG = os.getenv('DEBUG')
-    if DEBUG:
-        DB_HOST = '192.168.0.202'
-
-    BD_PASS = os.getenv('BD_PASS')
 
 
     try:
         with connect(
-                host=DB_HOST,
-                port=3300,
-                user='test',
+                ost=DB_HOST,
+                port=DB_PORT,
+                user=DB_USER,
                 password=BD_PASS,
-                database='egor_db'
+                database=MYSQL_DATABASE,
         ) as connection:
             print('Соединение с базой из all_produts')
             with connection.cursor() as cr:
@@ -106,20 +104,17 @@ async def db_mysql_category_request() -> dict:
     request = fr'SELECT Common.`id`, Category.`Название категории продукта` ' \
               fr'FROM Category, Common ' \
               fr'WHERE Category.`id` = Common.`product_cat_id`'
-    BD_PASS = os.getenv('BD_PASS')
+
     answer_dict = {}
-    load_dotenv()
-    DEBUG = os.getenv('DEBUG')
-    if DEBUG:
-        DB_HOST = '192.168.0.202'
+
 
     try:
         with connect(
-                host=DB_HOST,
-                port=3300,
-                user='test',
+                ost=DB_HOST,
+                port=DB_PORT,
+                user=DB_USER,
                 password=BD_PASS,
-                database='egor_db'
+                database=MYSQL_DATABASE,
         ) as connection:
             print('Соединение с базой из category_products')
             with connection.cursor() as cr:
