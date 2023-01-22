@@ -9,11 +9,7 @@ BD_PASS = os.getenv('DB_PASS')
 DB_PORT = os.getenv('DB_PORT')
 DB_USER = os.getenv('DB_USER')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
-
-if DEBUG != False:
-    DB_HOST = '192.168.0.202'
-else:
-    DB_HOST = os.getenv('DB_HOST')
+DB_HOST = os.getenv('DB_HOST')
 
 def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
@@ -70,7 +66,8 @@ def db_mysql_request(request: str):
 async def db_mysql_all_products() -> dict:
     request = r'SELECT `id`, `Название продукта` FROM Common'
 
-
+    print(BD_PASS)
+    print(DB_HOST)
     try:
         with connect(
                 host=DB_HOST,
@@ -100,7 +97,8 @@ async def db_mysql_category_request() -> dict:
     connecting with db immutabel request
     :return: dict with category and id of products
     """
-
+    print(BD_PASS)
+    print(DB_HOST)
     request = fr'SELECT Common.`id`, Category.`Название категории продукта` ' \
               fr'FROM Category, Common ' \
               fr'WHERE Category.`id` = Common.`product_cat_id`'
