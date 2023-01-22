@@ -12,3 +12,4 @@ test
 .env
 /.env
 /Deploy/db_dump/
+/Deploy/ssl/
