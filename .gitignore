@@ -9,3 +9,5 @@ win_bot_start.bat
 log.txt
 egor_bot.db
 test
+.env
+/.env

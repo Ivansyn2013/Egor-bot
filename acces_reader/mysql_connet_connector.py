@@ -1,21 +1,25 @@
 import os
-from PIL import Image
-import io
+
 from mysql.connector import connect, Error
-import pickle
-from features import one_srt_answer, get_answer_str
-import asyncio
+from dotenv import load_dotenv
+
 
 
 def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
     result is empty or raise an Error'''
 
+    load_dotenv()
+    DEBUG = os.getenv('DEBUG')
+
+    if DEBUG:
+        DB_HOST = '192.168.0.202'
+
     BD_PASS = os.getenv('BD_PASS')
     # print(BD_PASS)
     try:
         with connect(
-                host='192.168.0.110',
+                host=DB_HOST,
                 port=3300,
                 user='test',
                 password=BD_PASS,
@@ -61,10 +65,17 @@ def db_mysql_request(request: str):
 
 async def db_mysql_all_products() -> dict:
     request = r'SELECT `id`, `Название продукта` FROM Common'
+    load_dotenv()
+    DEBUG = os.getenv('DEBUG')
+    if DEBUG:
+        DB_HOST = '192.168.0.202'
+
     BD_PASS = os.getenv('BD_PASS')
+
+
     try:
         with connect(
-                host='192.168.0.110',
+                host=DB_HOST,
                 port=3300,
                 user='test',
                 password=BD_PASS,
@@ -97,9 +108,14 @@ async def db_mysql_category_request() -> dict:
               fr'WHERE Category.`id` = Common.`product_cat_id`'
     BD_PASS = os.getenv('BD_PASS')
     answer_dict = {}
+    load_dotenv()
+    DEBUG = os.getenv('DEBUG')
+    if DEBUG:
+        DB_HOST = '192.168.0.202'
+
     try:
         with connect(
-                host='192.168.0.110',
+                host=DB_HOST,
                 port=3300,
                 user='test',
                 password=BD_PASS,
@@ -109,7 +125,7 @@ async def db_mysql_category_request() -> dict:
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
-                #print(answer_row)
+                # print(answer_row)
                 if answer_row is None:
                     return None
                 else:
@@ -119,7 +135,7 @@ async def db_mysql_category_request() -> dict:
                         else:
                             answer_dict[name] = [id]
 
-                    #print(answer_dict)
+                    # print(answer_dict)
                     return answer_dict
 
     except Error as e:

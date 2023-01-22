@@ -1,17 +1,18 @@
-from aiogram import types
+import os
+from colorama import Fore, Style
 from aiogram.utils import executor
-
-from create_obj import dp, bot
-from sql_bd import sql_start
-from inline_butn import get_product_list_kb
-from acces_reader import db_mysql_all_products
-
-
+from mysql.connector import connect
+from create_obj import dp , db_test_connect
+from dotenv import load_dotenv
 
 
 async def on_startup(_):
+    load_dotenv()
+    print(os.getenv('DB_HOST'))
     print('Бот загрузился')
-    sql_start() #sqllite база
+    print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
+            db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
+
     global kb_list
 
 
@@ -24,6 +25,5 @@ admin.register_handlers_admin(dp)
 # для записи сообщений которые не ловятся хенжлерами
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
-
 
 executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
