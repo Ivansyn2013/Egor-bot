@@ -13,11 +13,12 @@ bot = Bot(token=os.getenv("TOKEN"), parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
 try:
     db_test_connect = connect(host=os.getenv('DB_HOST'),
-                              port=3300,
-                              user='test',
-                              password=os.getenv('BD_PASS'),
-                              database='egor_db',
+                              port=os.getenv('DB_PORT'),
+                              user=os.getenv('MYSQL_USER'),
+                              password=os.getenv('MYSQL_PASSWORD'),
+                              database=os.getenv('MYSQL_USER'),
                               ).is_connected()
 except Exception as e:
-    print('Error in db connectind')
+    print('Error in db connecting')
     print(e)
+    db_test_connect = None
