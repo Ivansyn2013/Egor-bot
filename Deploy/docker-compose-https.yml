@@ -23,7 +23,7 @@ services:
       - "../requirements.txt:/app/req.txt"
       - "../create_obj.py:/app/create_obj.py"
       - "../keybords:/app/keybords"
-      - "../access_reader:/app/access_reader"
+      - "../acces_reader:/app/acces_reader"
       - "../handlers:/app/handlers"
       - "../inline_butn:/app/inline_butn"
 
