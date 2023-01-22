@@ -12,7 +12,6 @@ from create_obj import bot
 from features import get_answer_str
 from inline_butn import inline_button_gen
 from keybords import kb_search, kb_client
-from sql_bd import sql_read
 from aiogram.dispatcher.filters import Text
 from inline_butn import cd_data
 from inline_butn import get_product_list_kb
@@ -178,8 +177,6 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                 await state.finish()
 
 
-
-
 async def search_callback(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
                           state=FSMContext):
@@ -288,22 +285,17 @@ async def product_list_callback_back(query: types.CallbackQuery,
                                       reply_markup=kb_list[kb_number - 1])
 
 
-# @dp
-async def command_show(message: types.Message):
-    await sql_read(message)
-
-
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=['start', 'help'])
     dp.register_message_handler(command_author, commands=['Авторизация'])
     # dp.register_message_handler(command_search, commands=['Поиск', 'Искать'])
-    dp.register_message_handler(command_show, commands='Show')
+    # dp.register_message_handler(command_show, commands='Show')
     dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
     dp.register_message_handler(command_product_list, commands=['Список_продуктов',
                                                                 'список продуктов'])
 
     dp.register_message_handler(search_go_to_db, state=FSMSearch.fs_search)
-#    dp.register_message_handler(search_options_db, state=FSMSearch.option_search)
+    #    dp.register_message_handler(search_options_db, state=FSMSearch.option_search)
     dp.register_message_handler(cancel_search_handler, commands=['Выйти_из_поиска',
                                                                  'отмена',
                                                                  'Отмена'],
