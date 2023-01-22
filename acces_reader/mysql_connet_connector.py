@@ -73,11 +73,11 @@ async def db_mysql_all_products() -> dict:
 
     try:
         with connect(
-                ost=DB_HOST,
+                host=DB_HOST,
                 port=DB_PORT,
                 user=DB_USER,
                 password=BD_PASS,
-                database=MYSQL_DATABASE,
+                database=MYSQL_DATABASE
         ) as connection:
             print('Соединение с базой из all_produts')
             with connection.cursor() as cr:
@@ -107,10 +107,9 @@ async def db_mysql_category_request() -> dict:
 
     answer_dict = {}
 
-
     try:
         with connect(
-                ost=DB_HOST,
+                host=DB_HOST,
                 port=DB_PORT,
                 user=DB_USER,
                 password=BD_PASS,
