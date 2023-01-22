@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from create_obj import bot
 from keybords import admin_kb
-from sql_bd import sql_add_command
+
 
 ID = None
 
@@ -71,7 +71,7 @@ async def load_price(message: types.Message, state: FSMContext):
     # await message.reply(str(data))
     # await message.answer('Готово')
     # запись в базу
-    await sql_add_command(state)
+
     # вызод из машинных состояний
     await state.finish()
 
