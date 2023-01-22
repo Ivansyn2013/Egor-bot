@@ -13,7 +13,7 @@ WEBAPP_HOST = os.getenv("WEBAPP_HOST")
 WEBAPP_PORT = os.getenv("WEBAPP_PORT")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-async def on_startup():
+async def on_startup(dp):
     print(os.getenv('DB_HOST'))
     print('Бот загрузился')
     print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if

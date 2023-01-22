@@ -16,7 +16,7 @@ try:
                               port=os.getenv('DB_PORT'),
                               user=os.getenv('MYSQL_USER'),
                               password=os.getenv('MYSQL_PASSWORD'),
-                              database=os.getenv('MYSQL_USER'),
+                              database=os.getenv('MYSQL_DATABASE'),
                               ).is_connected()
 except Exception as e:
     print('Error in db connecting')
