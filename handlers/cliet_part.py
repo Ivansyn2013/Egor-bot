@@ -1,5 +1,4 @@
 from difflib import get_close_matches
-from PIL import ImageFile
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -18,7 +17,7 @@ from inline_butn import get_product_list_kb
 import typing
 
 kb_list = []
-ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 
 
 class FSMSearch(StatesGroup):
