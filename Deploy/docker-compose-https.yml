@@ -26,6 +26,7 @@ services:
       - "../acces_reader:/app/acces_reader"
       - "../handlers:/app/handlers"
       - "../inline_butn:/app/inline_butn"
+      - "../features:/app/features"
 
     expose:
       - "5001"
