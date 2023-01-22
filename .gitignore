@@ -11,3 +11,4 @@ egor_bot.db
 test
 .env
 /.env
+/Deploy/db_dump/
