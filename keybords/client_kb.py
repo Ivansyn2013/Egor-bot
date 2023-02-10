@@ -5,6 +5,7 @@ b1 =KeyboardButton('Узнать о боте')
 b2 =KeyboardButton('Поиск')
 b3 =KeyboardButton('Категории продуктов')
 b4 = KeyboardButton('Список продуктов')
+b5 = KeyboardButton('Поддержать проект')
 
 
 search_b1 = KeyboardButton('Искать')
@@ -27,5 +28,5 @@ kb_search = ReplyKeyboardMarkup(resize_keyboard=True,
 #.insert добавляет кнопку если есть место рядом
 #.row(but1,but2...) медот добавляет все кнопки в строку
 
-kb_client.add(b1).add(b2).add(b3).add(b4)
+kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
 kb_search.add(search_b1).add(search_b2)

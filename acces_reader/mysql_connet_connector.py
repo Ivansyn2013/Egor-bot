@@ -15,8 +15,6 @@ def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
     result is empty or raise an Error'''
 
-    print(BD_PASS)
-    print(DB_HOST)
     try:
         with connect(
                 host=DB_HOST,

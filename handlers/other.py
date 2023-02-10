@@ -4,6 +4,7 @@ import string
 from aiogram import types
 from aiogram.dispatcher import Dispatcher
 from aiogram.dispatcher.filters import Text
+from aiogram.utils.markdown import hlink, link
 
 from create_obj import  bot
 from keybords import kb_client, kb_answer_and_qusetion
@@ -34,7 +35,7 @@ async def answer_and_qusetion(message: types.Message):
 
 
 
-async def test_mes(message: types.Message):
+async def start_mes(message: types.Message):
     await bot.send_message(message.from_user.id,
                            'Привет! Меня зовут @ibs_doc_bot. Я помогу тебе '
                            'справиться с повышенным газообразованием ;)\n  При '
@@ -51,14 +52,29 @@ async def test_mes(message: types.Message):
                            '',
                            reply_markup=kb_client)
     print('Есть сообщение')
-    print(message.text)
+    print(message)
+
+async def donat_handler(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                            text=link('Нажми сюда',
+                                      'https://donate.stream/jarantat',
+                                      ),
+                           parse_mode='Markdown',
+                           disable_web_page_preview=True)
+
 
 
 def register_handlers_other(dp: Dispatcher):
     dp.register_message_handler(answer_and_qusetion, Text(equals=filter_list,
                                                ignore_case=True))
 
-    dp.register_message_handler(test_mes)
+
+    dp.register_message_handler(donat_handler, Text(
+                                                    equals=['Поддержать '
+                                                            'проект'],
+                                               ignore_case=True))
+
+    dp.register_message_handler(start_mes)
 
 
 if __name__ == "__main__":
