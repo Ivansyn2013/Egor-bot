@@ -6,11 +6,14 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage  # хранилищ
 from aiogram.dispatcher import Dispatcher
 from aiogram import types
 from dotenv import load_dotenv
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 load_dotenv()
 storage = MemoryStorage()
 bot = Bot(token=os.getenv("TOKEN"), parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
+dp.middleware.setup(LoggingMiddleware())
+
 try:
     db_test_connect = connect(host=os.getenv('DB_HOST'),
                               port=os.getenv('DB_PORT'),

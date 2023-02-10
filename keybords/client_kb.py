@@ -2,13 +2,13 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 
 #создание клавиатуры с кнопками
 b1 =KeyboardButton('Узнать о боте')
-b2 =KeyboardButton('/Поиск')
-b3 =KeyboardButton('/Категории_продуктов')
-b4 = KeyboardButton('/Список_продуктов')
+b2 =KeyboardButton('Поиск')
+b3 =KeyboardButton('Категории продуктов')
+b4 = KeyboardButton('Список продуктов')
 
 
-search_b1 = KeyboardButton('/Искать')
-search_b2 = KeyboardButton('/Выйти_из_поиска')
+search_b1 = KeyboardButton('Искать')
+search_b2 = KeyboardButton('Выйти из поиска')
 #кнопки номера и локации(
 # b4 =KeyboardButton('Поделиться номером', request_contact=True)
 # b5 =KeyboardButton('Отправить где я', request_location=True)

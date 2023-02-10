@@ -36,36 +36,25 @@ async def answer_and_qusetion(message: types.Message):
 
 async def test_mes(message: types.Message):
     await bot.send_message(message.from_user.id,
-                           'Привет! Егор большой борец за здоровье нас и нашей планеты, '
-                           'он попросил меня помочь ему снизить выделение парниковых '
-                           'газов!\nВот что я могу:\n'
-                           'Список продуктов: покажет продукты, о которых я знаю\n'
-                           'Поиск по продуктам: нажми поиск и отправь название '
-                           'продукта, что бы получить информацию, если я сразу не '
-                           'пойму, что это, то предложу что-нибудь \n'
-                           'Набери "отмена" в любом меню, что бы вернуться в главное \n'
-                           ' \n'
+                           'Привет! Меня зовут @ibs_doc_bot. Я помогу тебе '
+                           'справиться с повышенным газообразованием ;)\n  При '
+                           'помощи поиска, категорий или общего списка ты  '
+                           'найдешь информацию по большинству  продуктов -  '
+                           'какие из них являются high-FODMAP, а какие '
+                           'low-FODMAP, а также сколько можно чего съесть, '
+                           'чтобы не вздуло. Если ты не знаешь что такое '
+                           'low-FODMAP диета, то посмотри в справке или '
+                           'подпишись на телеграм-канал @ibs_doc или '
+                           'инстаграм\n https://instagram.com/ibs.doc\n Также '
+                           'ты '
+                           'можешь помочь в моем развитии, для этого есть удобная кнопка доната ;)'
                            '',
                            reply_markup=kb_client)
     print('Есть сообщение')
     print(message.text)
-    with open("log.txt", 'a+', encoding='utf-8') as f:
-        f.write(message.date.ctime())
-        f.write(message.from_user.username)
-        f.write(f': {message.text}')
-        f.write('\n')
 
-
-# @dp.message_handler() эхо
-# async def echo_send(message: types.Message):
-#     await message.answer(message.text)
-#     await message.reply(message.text)
-#     await bot.send_message(message.from_user.id, message.text)
-
-#dp.register_message_handler(test_mes)
 
 def register_handlers_other(dp: Dispatcher):
-    # dp.register_message_handler(echo_send)
     dp.register_message_handler(answer_and_qusetion, Text(equals=filter_list,
                                                ignore_case=True))
 

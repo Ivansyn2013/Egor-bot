@@ -19,7 +19,6 @@ import typing
 kb_list = []
 
 
-
 class FSMSearch(StatesGroup):
     fs_search = State()
     option_search = State()
@@ -27,11 +26,10 @@ class FSMSearch(StatesGroup):
 
 
 async def cancel_search_handler(message: types.Message, state: FSMContext):
-    current_state = await state.get_state()
-    if current_state is None:
-        await message.reply('Выход',
-                            reply_markup=kb_client)
-        return
+    # current_state = await state.get_state()
+    # if current_state is None:
+    #     await message.reply('Выход',
+    #                         reply_markup=kb_client)
     await state.finish()
     await message.reply('Команда отмены: ok',
                         reply_markup=kb_client)
@@ -57,13 +55,11 @@ async def command_search(message: types.Message):
 
 # commands=['Искать']
 async def start_searching(message: types.Message):
-    await FSMSearch.fs_search.set()
-    await message.reply('Введи название продукта',
-                        reply_markup=kb_search)
+    if message.text == 'Поиск':
+        await FSMSearch.fs_search.set()
+        await message.reply('Введи название продукта',
+                            reply_markup=kb_search)
 
-
-async def search_function(message):
-    await bot.send_message(message.from_user.id, 'Hi')
 
 
 # поиск по категориям
@@ -107,10 +103,10 @@ async def callback_category(query: types.CallbackQuery,
 
 
 async def search_go_to_db(message: types.Message, state=FSMContext):
-    if message.text == '/Искать':
+    if message.text == 'Искать':
         await bot.send_message(message.from_user.id,
                                'Введи название продукта:')
-    elif message.text == '/Выйти_из_поиска':
+    elif message.text == 'Выйти из поиска':
         await state.finish()
         await bot.send_message(message.from_user.id,
                                'Отмена поиска',
@@ -287,21 +283,33 @@ async def product_list_callback_back(query: types.CallbackQuery,
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=['start', 'help'])
     dp.register_message_handler(command_author, commands=['Авторизация'])
-    # dp.register_message_handler(command_search, commands=['Поиск', 'Искать'])
-    # dp.register_message_handler(command_show, commands='Show')
-    dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
-    dp.register_message_handler(command_product_list, commands=['Список_продуктов',
-                                                                'список продуктов'])
+    #    dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
+    dp.register_message_handler(start_searching, Text(equals=['Поиск'],
+                                                      ignore_case=True))
+    dp.register_message_handler(command_product_list,
+                                Text(
+                                    equals=['Список '
+                                            'продуктов'],
+                                    ignore_case=True))
 
     dp.register_message_handler(search_go_to_db, state=FSMSearch.fs_search)
     #    dp.register_message_handler(search_options_db, state=FSMSearch.option_search)
-    dp.register_message_handler(cancel_search_handler, commands=['Выйти_из_поиска',
-                                                                 'отмена',
-                                                                 'Отмена'],
-                                state='*')
-    dp.register_message_handler(cancel_search_handler, Text(equals='отмена',
-                                                            ignore_case=True), state="*")
-    dp.register_message_handler(start_category_search, commands=['Категории_продуктов'])
+    dp.register_message_handler(cancel_search_handler,
+                                Text(
+                                    equals=['Выйти из поиска',
+                                            'Отмена'],
+                                    ignore_case=True),
+                                state='*'
+                                )
+    dp.register_message_handler(cancel_search_handler,
+                                Text(equals='отмена',
+                                     ignore_case=True),
+                                state="*",
+                                )
+    dp.register_message_handler(start_category_search,
+                                Text(equals=['Категории продуктов'],
+                                     ignore_case=True
+                                     ))
 
     dp.register_callback_query_handler(search_callback,
                                        cd_data.filter(action='search'),

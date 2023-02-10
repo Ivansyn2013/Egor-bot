@@ -5,7 +5,8 @@ from mysql.connector import connect
 from create_obj import dp, db_test_connect, bot
 from dotenv import load_dotenv
 from aiogram.utils.executor import start_webhook
-import logging
+
+
 
 load_dotenv()
 
@@ -14,7 +15,6 @@ WEBAPP_PORT = os.getenv("WEBAPP_PORT")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 async def on_startup(dp):
-    print(os.getenv('DB_HOST'))
     print('Бот загрузился')
     print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
     db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
@@ -22,14 +22,14 @@ async def on_startup(dp):
     global kb_list
 
 async def on_shutdown(dp):
-    logging.warning('Shutting down..')
+    #logging.warning('Shutting down..')
     # insert code here to run it before shutdown
     # Remove webhook (not acceptable in some cases)
     await bot.delete_webhook()
     # Close DB connection (if used)
     await dp.storage.close()
     await dp.storage.wait_closed()
-    logging.warning('Bye!')
+    #logging.warning('Bye!')
 
 
 from handlers import cliet_part, admin, other
@@ -43,14 +43,14 @@ admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
 # для пулинга
-#executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
-start_webhook(
-    dispatcher=dp,
-    webhook_path='/',
-    on_startup=on_startup,
-    on_shutdown=on_shutdown,
-    skip_updates=True,
-    host=WEBAPP_HOST,
-    port=WEBAPP_PORT,
-)
+# start_webhook(
+#     dispatcher=dp,
+#     webhook_path='/',
+#     on_startup=on_startup,
+#     on_shutdown=on_shutdown,
+#     skip_updates=True,
+#     host=WEBAPP_HOST,
+#     port=WEBAPP_PORT,
+# )
