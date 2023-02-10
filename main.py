@@ -10,9 +10,12 @@ from aiogram.utils.executor import start_webhook
 
 load_dotenv()
 
+DEBUG = os.getenv('DEBUG')
 WEBAPP_HOST = os.getenv("WEBAPP_HOST")
 WEBAPP_PORT = os.getenv("WEBAPP_PORT")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
+
 
 async def on_startup(dp):
     print('Бот загрузился')
@@ -42,15 +45,17 @@ admin.register_handlers_admin(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
-# для пулинга
-executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
-# start_webhook(
-#     dispatcher=dp,
-#     webhook_path='/',
-#     on_startup=on_startup,
-#     on_shutdown=on_shutdown,
-#     skip_updates=True,
-#     host=WEBAPP_HOST,
-#     port=WEBAPP_PORT,
-# )
+if DEBUG:
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+
+else:
+    start_webhook(
+        dispatcher=dp,
+        webhook_path='/',
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )

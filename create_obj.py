@@ -14,6 +14,7 @@ bot = Bot(token=os.getenv("TOKEN"), parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
 
+
 try:
     db_test_connect = connect(host=os.getenv('DB_HOST'),
                               port=os.getenv('DB_PORT'),
