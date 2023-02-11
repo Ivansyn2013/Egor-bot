@@ -54,6 +54,12 @@ async def start_mes(message: types.Message):
     print('Есть сообщение')
     print(message)
 
+# async def get_photo_mes(photo: types.Message.photo):
+#     print('есть фото')
+#     print(photo)
+
+
+
 async def donat_handler(message: types.Message):
     await bot.send_message(message.from_user.id,
                             text=link('Нажми сюда',
@@ -75,6 +81,7 @@ def register_handlers_other(dp: Dispatcher):
                                                ignore_case=True))
 
     dp.register_message_handler(start_mes)
+#    dp.register_message_handler(get_photo_mes)
 
 
 if __name__ == "__main__":

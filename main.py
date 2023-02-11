@@ -47,15 +47,15 @@ other.register_handlers_other(dp)
 
 
 if DEBUG:
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
 
-else:
-    start_webhook(
-        dispatcher=dp,
-        webhook_path='/',
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
-    )
+# else:
+#     start_webhook(
+#         dispatcher=dp,
+#         webhook_path='/',
+#         on_startup=on_startup,
+#         on_shutdown=on_shutdown,
+#         skip_updates=True,
+#         host=WEBAPP_HOST,
+#         port=WEBAPP_PORT,
+#     )
