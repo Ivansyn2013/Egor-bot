@@ -116,7 +116,7 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
         async with state.proxy() as data:
             data['search_text'] = message.text
 
-            res = db_mysql_request(data['search_text'])
+            res = await db_mysql_request(data['search_text'])
             print(data['search_text'])
             await bot.send_message(message.from_user.id,
                                    'Ищу')
@@ -181,7 +181,7 @@ async def search_callback(query: types.CallbackQuery,
         request = [x for x, y in data['bd_dict'].items()
                    if y == int(callback_data['bd_id'])]
 
-        res = db_mysql_request(request[0])
+        res = await db_mysql_request(request[0])
 
     if res is None:
         await bot.send_message(query.from_user.id,
@@ -233,7 +233,7 @@ async def product_list_enter(query: types.CallbackQuery,
     request = [x for x, y in search_dict.items()
                if y == int(callback_data['bd_id'])]
 
-    res = db_mysql_request(request[0])
+    res = await db_mysql_request(request[0])
 
     if res is None:
         await bot.send_message(query.from_user.id,

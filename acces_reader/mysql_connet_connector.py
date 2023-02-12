@@ -11,7 +11,7 @@ DB_USER = os.getenv('DB_USER')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
 DB_HOST = os.getenv('DB_HOST')
 
-def db_mysql_request(request: str):
+async def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
     result is empty or raise an Error'''
 
@@ -133,31 +133,61 @@ async def db_mysql_category_request() -> dict:
         print(e)
         return None
 
+async def db_mysql_search_product_id(item) -> vars:
+    '''
+
+    :param item: product name
+    :return : id of product from db
+    '''
+
+    request = rf"SELECT id FROM `Common`WHERE `Название продукта` =  '{item}'"
+    try:
+        with connect(
+                host=DB_HOST,
+                port=DB_PORT,
+                user=DB_USER,
+                password=BD_PASS,
+                database=MYSQL_DATABASE,
+        ) as connection:
+            with connection.cursor() as cr:
+                cr.execute(request)
+                result = cr.fetchone()
+        return result[-1]
+
+    except Error as e:
+        print('Это ошибка из db_mysql_search_product_id')
+        print(e)
+        return None
+
+
+async def db_mysql_update_photo(id, photo):
+    '''
+    Update photo in DB
+    :param id: product id
+    :return : None
+    '''
+    request = rf"UPDATE `jpeg_images` SET `image` = '{photo}' " \
+              rf"WHERE `common_id` = {id}"
+    try:
+        with connect(
+                host=DB_HOST,
+                port=DB_PORT,
+                user=DB_USER,
+                password=BD_PASS,
+                database=MYSQL_DATABASE,
+        ) as connection:
+            with connection.cursor() as cr:
+                cr.execute(request)
+                connection.commit()
+                return True
+
+    except Error as e:
+        print('Это ошибка из db_mysql_update_photo')
+        print(e)
+        return None
+
 
 if __name__ == '__main__':
-    res = db_mysql_request('Перловка')
-    # print(res)
-    # print(res.keys())
-    # print(res['Отображение'])
+    res = db_mysql_search_product_id('Перловка')
+    print(res[-1])
 
-    res.pop('image')
-    res.pop('Картинка')
-    print(res.items())
-    # image_data = res['image'][0]
-    # print(len(image_data))
-    # print(type(image_data))
-    # image = Image.open(io.BytesIO(image_data))
-    # image.show()
-    # with open('tmp2.jpg', 'wb') as f:
-    #     f.save(image_data)
-    # print(res["Отображение"][res["Фруктаны"]])
-    # print(res["Отображение"][res["Фруктаны"][1]])
-    # print(res["Отображение"][res["Фруктаны"][2]])
-
-    # for inx in range(len(list(res.values())[0])):
-    #     print('*'*100)
-    #     print(f'индекс{inx}')
-    #     print(one_srt_answer(res,inx))
-    print(db_mysql_all_products())
-    res = db_mysql_all_products()
-    print(list(res.keys()))
