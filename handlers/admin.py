@@ -1,4 +1,3 @@
-
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -116,12 +115,14 @@ async def set_photo(message: types.Message, state: FSMContext):
     print('режим фото')
     async with state.proxy() as data:
         try:
-            data['photo'] = message.photo[-1]
+            await message.photo[-1].download(destination_file='tmp/tmp.jpg')
+            #data['photo'] = open('tmp/tmp.jpg', 'rb')
+
             data['chat_id'] = message.from_user.id
             await bot.send_message(message.from_user.id,
                                    f'Что получилось:')
             await bot.send_photo(message.from_user.id,
-                                 data['photo'],
+                                 open('tmp/tmp.jpg','rb'),
                                  data['product_id'])
 
 
@@ -137,9 +138,11 @@ async def set_photo(message: types.Message, state: FSMContext):
     await FSMAdmin.update_photo_state.set()
 
 async def update_photo(message: types.Message, state: FSMContext):
+    with open('tmp/tmp.jpg', 'rb') as f:
+        b_photo = f.read()
     async with state.proxy() as data:
 
-        request = await db_mysql_update_photo(data['product_id'],data['photo'])
+        request = await db_mysql_update_photo(data['product_id'], b_photo)
         if request:
             await bot.send_message(data['chat_id'],
                              'Картинка успешно добавлена')

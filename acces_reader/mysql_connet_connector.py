@@ -166,8 +166,12 @@ async def db_mysql_update_photo(id, photo):
     :param id: product id
     :return : None
     '''
-    request = rf"UPDATE `jpeg_images` SET `image` = '{photo}' " \
-              rf"WHERE `common_id` = {id}"
+
+#надо писать запросы через коннектор именно так
+    request = '''UPDATE jpeg_images SET image = %s WHERE common_id = %s'''
+    request_data = (photo, id)
+    print(request)
+    print()
     try:
         with connect(
                 host=DB_HOST,
@@ -177,7 +181,7 @@ async def db_mysql_update_photo(id, photo):
                 database=MYSQL_DATABASE,
         ) as connection:
             with connection.cursor() as cr:
-                cr.execute(request)
+                cr.execute(request, request_data)
                 connection.commit()
                 return True
 
@@ -188,6 +192,38 @@ async def db_mysql_update_photo(id, photo):
 
 
 if __name__ == '__main__':
-    res = db_mysql_search_product_id('Перловка')
-    print(res[-1])
+    #res = db_mysql_search_product_id('Перловка')
+    #print(res[-1])
+    def mysql_connector_test(id):
+        try:
+            with connect(
+                    host=DB_HOST,
+                    port=DB_PORT,
+                    user=DB_USER,
+                    password=BD_PASS,
+                    database=MYSQL_DATABASE,
+            ) as connection:
+                print(connection)
+                print("Соединение с базой")
+
+                select_req_string = fr'SELECT * FROM jpeg_images ' \
+                                    fr"WHERE common_id = {id}"
+
+
+                with connection.cursor() as cr:
+                    cr.execute(select_req_string)
+
+                    req_all = cr.fetchall()
+                    return req_all
+
+        except Error as e:
+            print('Это ошибка', end='')
+            print(e)
+            return None
+
+    res = mysql_connector_test(3)
+    print(res[0][2])
+    ph = open('../tmp/tmp.jpg','rb')
+    print('\n\n\n\n\n')
+    #print(*ph)
 
