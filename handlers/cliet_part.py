@@ -1,25 +1,30 @@
+import logging
+import typing
 from difflib import get_close_matches
+
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from inline_butn.search_inline_but import inline_buttons_gen_category
 
 from acces_reader import db_mysql_request, db_mysql_all_products, \
     db_mysql_category_request
 from create_obj import bot
 from features import get_answer_str
-from inline_butn import inline_button_gen
-from keybords import kb_search, kb_client
-from aiogram.dispatcher.filters import Text
 from inline_butn import cd_data
 from inline_butn import get_product_list_kb
-import typing
+from inline_butn import inline_button_gen
+from inline_butn.search_inline_but import inline_buttons_gen_category
+from keybords import kb_search, kb_client
 
 kb_list = []
 
 
 class FSMSearch(StatesGroup):
+    '''
+    State for work with seacrh
+    '''
     fs_search = State()
     option_search = State()
     callback_search_state = State()
@@ -39,9 +44,8 @@ async def cancel_search_handler(message: types.Message, state: FSMContext):
 async def command_start(message: types.Message):
     try:
         await bot.send_message(message.from_user.id,
-                               'Привет обжорам!!!\n'
-                               'https://mastergroosha.github.io/aiogram-3-guide/fsm/ ',
-                               reply_markup=kb_client)
+                               'Привет обжорам!!!\n',
+                                reply_markup=kb_client)
         await message.delete()
     except:
         await message.reply('Напишите боту в ЛС')
@@ -55,11 +59,11 @@ async def command_search(message: types.Message):
 
 # commands=['Искать']
 async def start_searching(message: types.Message):
+    '''function start search and redirect message to {search_go_to_db} '''
     if message.text == 'Поиск':
         await FSMSearch.fs_search.set()
         await message.reply('Введи название продукта',
                             reply_markup=kb_search)
-
 
 
 # поиск по категориям
@@ -154,27 +158,32 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
 
 
             else:
-                image_data = res['image'][0]
+                if all(map(lambda x: x is None, res.get('image'))):
+                    await message.delete()
+                    await bot.send_message(message.from_user.id,
+                                            f'{get_answer_str(res)}',
+                                            parse_mode='html',
+                                           )
+                    await state.finish()
 
-                # print(res.keys())
-                res.pop('image')
-                res.pop('Картинка')
-                # print(res.keys())
-                print(res.items())
-
-                await message.delete()
-
-                await bot.send_photo(message.from_user.id,
-                                     image_data,
-                                     f'{get_answer_str(res)}',
-                                     parse_mode='html'
-                                     )
-                await state.finish()
+                else:
+                    image_data = res['image'][0]
+                    res.pop('image')
+                    res.pop('Картинка')
+                    print(res.items())
+                    await message.delete()
+                    await bot.send_photo(message.from_user.id,
+                                         image_data,
+                                         f'{get_answer_str(res)}',
+                                         parse_mode='html'
+                                         )
+                    await state.finish()
 
 
 async def search_callback(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
                           state=FSMContext):
+    ''''''
     async with state.proxy() as data:
         # print(data['bd_dict'])
         # print(callback_data['bd_id'])
@@ -228,11 +237,13 @@ async def command_product_list(message: types.Message):
 #
 async def product_list_enter(query: types.CallbackQuery,
                              callback_data: typing.Dict[str, str]):
+    '''function get product id from callback_data and redirest it in db_request
+    send result to user'''
+
     search_dict = await db_mysql_all_products()
 
     request = [x for x, y in search_dict.items()
                if y == int(callback_data['bd_id'])]
-
     res = await db_mysql_request(request[0])
 
     if res is None:

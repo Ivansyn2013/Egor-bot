@@ -1,7 +1,9 @@
+import logging
 import os
 
-from mysql.connector import connect, Error
 from dotenv import load_dotenv
+from mysql.connector import connect, Error
+
 load_dotenv()
 
 DEBUG = os.getenv('DEBUG')
@@ -10,6 +12,7 @@ DB_PORT = os.getenv('DB_PORT')
 DB_USER = os.getenv('DB_USER')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
 DB_HOST = os.getenv('DB_HOST')
+
 
 async def db_mysql_request(request: str):
     '''Function connecting to mysql db and return dict with value or None if seach
@@ -30,11 +33,11 @@ async def db_mysql_request(request: str):
                                 fr'JOIN dose ON Common.id = dose.common_id ' \
                                 fr'JOIN fodmap ON Common.fodmap_id = fodmap.id ' \
                                 fr'JOIN Color ON dose.color_id = Color.id ' \
-                                fr'JOIN jpeg_images ON jpeg_images.common_id =' \
+                                fr'LEFT JOIN jpeg_images ON jpeg_images.common_id =' \
                                 fr'Common.id ' \
                                 fr"WHERE `Название продукта` = '{request}'"
 
-            display_answer = fr'SELECT `Отображение`FROM Color'
+            display_answer = fr'SELECT `Отображение` FROM Color'
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
                 # это кортеж из табличных строк
@@ -62,6 +65,9 @@ async def db_mysql_request(request: str):
 
 
 async def db_mysql_all_products() -> dict:
+    '''dict with all products from db or None if error
+        :return: dict or None'''
+
     request = r'SELECT `id`, `Название продукта` FROM Common'
 
     print(BD_PASS)
@@ -75,6 +81,7 @@ async def db_mysql_all_products() -> dict:
                 database=MYSQL_DATABASE
         ) as connection:
             print('Соединение с базой из all_produts')
+            logging.info('Соединение с базой из all_produts')
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
@@ -95,8 +102,7 @@ async def db_mysql_category_request() -> dict:
     connecting with db immutabel request
     :return: dict with category and id of products
     """
-    print(BD_PASS)
-    print(DB_HOST)
+
     request = fr'SELECT Common.`id`, Category.`Название категории продукта` ' \
               fr'FROM Category, Common ' \
               fr'WHERE Category.`id` = Common.`product_cat_id`'
@@ -133,6 +139,7 @@ async def db_mysql_category_request() -> dict:
         print(e)
         return None
 
+
 async def db_mysql_search_product_id(item) -> vars:
     '''
 
@@ -167,11 +174,10 @@ async def db_mysql_update_photo(id, photo):
     :return : None
     '''
 
-#надо писать запросы через коннектор именно так
+    # надо писать запросы через коннектор именно так
     request = '''UPDATE jpeg_images SET image = %s WHERE common_id = %s'''
     request_data = (photo, id)
-    print(request)
-    print()
+
     try:
         with connect(
                 host=DB_HOST,
@@ -192,9 +198,10 @@ async def db_mysql_update_photo(id, photo):
 
 
 if __name__ == '__main__':
-    #res = db_mysql_search_product_id('Перловка')
-    #print(res[-1])
-    def mysql_connector_test(id):
+    # res = db_mysql_search_product_id('Перловка')
+    # print(res[-1])
+    def mysql_connector_test(*id):
+        '''test func '''
         try:
             with connect(
                     host=DB_HOST,
@@ -206,24 +213,30 @@ if __name__ == '__main__':
                 print(connection)
                 print("Соединение с базой")
 
-                select_req_string = fr'SELECT * FROM jpeg_images ' \
-                                    fr"WHERE common_id = {id}"
-
+                select_req_string = fr'SELECT * FROM Common ' \
+                                    fr"WHERE `Название продукта` = 'Молоко'"
 
                 with connection.cursor() as cr:
                     cr.execute(select_req_string)
 
                     req_all = cr.fetchall()
-                    return req_all
+                    firts_list = [[] for x in range(len(req_all[0]))]
+                    for y in range(len(req_all)):
+                        for x in range(len(req_all[y])):
+                            firts_list[x].append(req_all[y][x])
+
+                    str_dict = dict(zip(cr.column_names, firts_list))
+                    return str_dict
 
         except Error as e:
             print('Это ошибка', end='')
             print(e)
             return None
 
-    res = mysql_connector_test(3)
-    print(res[0][2])
-    ph = open('../tmp/tmp.jpg','rb')
-    print('\n\n\n\n\n')
-    #print(*ph)
 
+    res = mysql_connector_test()
+    res.pop('Картинка')
+    print(res.values())
+    #ph = open('../tmp/tmp.jpg', 'rb')
+    print('\n\n\n\n\n')
+    # print(*ph)

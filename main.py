@@ -1,12 +1,11 @@
 import os
-from colorama import Fore, Style
+
 from aiogram.utils import executor
-from mysql.connector import connect
-from create_obj import dp, db_test_connect, bot
-from dotenv import load_dotenv
 from aiogram.utils.executor import start_webhook
-
-
+from colorama import Fore, Style
+from dotenv import load_dotenv
+from create_obj import dp, db_test_connect, bot
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 load_dotenv()
 
@@ -16,7 +15,6 @@ WEBAPP_PORT = os.getenv("WEBAPP_PORT")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 
-
 async def on_startup(dp):
     print('Бот загрузился')
     print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
@@ -24,13 +22,11 @@ async def on_startup(dp):
     if not DEBUG:
         await bot.set_webhook(WEBHOOK_URL)
 
-
-
-
     global kb_list
 
+
 async def on_shutdown(dp):
-    #logging.warning('Shutting down..')
+    # logging.warning('Shutting down..')
     # insert code here to run it before shutdown
     # Remove webhook (not acceptable in some cases)
     await bot.delete_webhook()
@@ -50,9 +46,9 @@ admin.register_handlers_admin(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
-
 if DEBUG:
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
+                           on_shutdown=on_shutdown)
 
 else:
     start_webhook(
