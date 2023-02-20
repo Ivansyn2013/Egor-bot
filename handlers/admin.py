@@ -98,6 +98,7 @@ async def set_fodmap(message: types.Message, state: FSMContext):
                            'Жду photo:')
 
 async def set_search_product_id(message: types.Message, state: FSMContext):
+
     product_id = await db_mysql_search_product_id(message.text)
     if product_id:
         async with state.proxy() as data:

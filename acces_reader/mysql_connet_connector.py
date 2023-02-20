@@ -175,7 +175,9 @@ async def db_mysql_update_photo(id, photo):
     '''
 
     # надо писать запросы через коннектор именно так
-    request = '''UPDATE jpeg_images SET image = %s WHERE common_id = %s'''
+    request_update = '''UPDATE jpeg_images SET image = %s WHERE common_id = %s'''
+    request_insert = '''INSERT INTO jpeg_images(image, common_id) VALUES (%s, %s)'''
+    request_find_record = f'SELECT image FROM jpeg_images WHERE common_id = {id}'
     request_data = (photo, id)
 
     try:
@@ -186,15 +188,20 @@ async def db_mysql_update_photo(id, photo):
                 password=BD_PASS,
                 database=MYSQL_DATABASE,
         ) as connection:
-            with connection.cursor() as cr:
-                cr.execute(request, request_data)
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute(request_find_record)
+                if  cursor.fetchone() is not None:
+                    cursor.execute(request_update, request_data)
+                else:
+                    cursor.execute(request_insert, request_data)
+
                 connection.commit()
                 return True
 
     except Error as e:
         print('Это ошибка из db_mysql_update_photo')
         print(e)
-        return None
+        return False
 
 
 if __name__ == '__main__':
@@ -210,33 +217,43 @@ if __name__ == '__main__':
                     password=BD_PASS,
                     database=MYSQL_DATABASE,
             ) as connection:
-                print(connection)
                 print("Соединение с базой")
 
                 select_req_string = fr'SELECT * FROM Common ' \
+                                    fr'LEFT JOIN jpeg_images on jpeg_images.common_id' \
+                                    fr' = Common.id ' \
                                     fr"WHERE `Название продукта` = 'Молоко'"
 
+                find_record = '''SELECT image FROM jpeg_images
+                                 WHERE common_id = (SELECT id FROM Common WHERE 
+                                 `Название продукта` = 'Молоко')'''
+
                 with connection.cursor() as cr:
-                    cr.execute(select_req_string)
+                    if cr.execute(find_record) == None:
+                        print(' request None')
+                        return None
+                   # print(cr.execute(select_req_string))
 
                     req_all = cr.fetchall()
+                    print(cr.column_names)
                     firts_list = [[] for x in range(len(req_all[0]))]
                     for y in range(len(req_all)):
                         for x in range(len(req_all[y])):
                             firts_list[x].append(req_all[y][x])
 
                     str_dict = dict(zip(cr.column_names, firts_list))
+                    print(str_dict)
                     return str_dict
 
         except Error as e:
-            print('Это ошибка', end='')
+            print('Это ошибка ', end='')
             print(e)
             return None
 
 
     res = mysql_connector_test()
-    res.pop('Картинка')
-    print(res.values())
+    #res.pop('Картинка')
+    #print(res.items())
     #ph = open('../tmp/tmp.jpg', 'rb')
-    print('\n\n\n\n\n')
+    #print('\n\n\n\n\n')
     # print(*ph)

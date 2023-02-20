@@ -1,7 +1,7 @@
 import logging
 import typing
 from difflib import get_close_matches
-
+from aiogram import exceptions
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -256,7 +256,7 @@ async def product_list_enter(query: types.CallbackQuery,
         image_data = res['image'][0]
         res.pop('image')
         res.pop('Картинка')
-
+    try:
         await bot.send_photo(
             query.from_user.id,
             image_data,
@@ -264,7 +264,15 @@ async def product_list_enter(query: types.CallbackQuery,
             parse_mode='html'
         )
         await query.answer()
-
+    except exceptions.BadRequest as error:
+        logging.CRITICAL('No photo in requst from DB from product_list_enter function')
+        logging.CRITICAL(f'{error}')
+        await bot.send_message(
+            query.from_user.id,
+            f'{get_answer_str(res)}',
+            parse_mode='html'
+        )
+        await query.answer()
 
 # action back and next
 async def product_list_callback_next(query: types.CallbackQuery,
