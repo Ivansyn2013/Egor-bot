@@ -45,7 +45,7 @@ async def cancel_search_handler(message: types.Message, state: FSMContext):
 async def command_start(message: types.Message):
     try:
         await bot.send_message(message.from_user.id,
-                               'Привет обжорам!!!\n',
+                               'Привет!!!\n',
                                 reply_markup=kb_client)
         await message.delete()
     except:
