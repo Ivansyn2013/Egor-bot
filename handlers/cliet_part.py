@@ -1,8 +1,9 @@
 import logging
 import typing
 from difflib import get_close_matches
-from aiogram import exceptions
+
 from aiogram import Dispatcher
+from aiogram import exceptions
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -278,7 +279,8 @@ async def product_list_enter(query: types.CallbackQuery,
 async def product_list_callback_next(query: types.CallbackQuery,
                                      callback_data: typing.Dict[str, str]):
     print(callback_data['kb_number'])
-    kb_number = int(callback_data['kb_number']) - 1
+    global kb_list
+    kb_number = int(callback_data['kb_number'])
     if kb_number >= len(kb_list) - 1:
         await  query.answer()
     else:
@@ -290,7 +292,8 @@ async def product_list_callback_next(query: types.CallbackQuery,
 async def product_list_callback_back(query: types.CallbackQuery,
                                      callback_data: typing.Dict[str, str]):
     print(callback_data['kb_number'])
-    kb_number = int(callback_data['kb_number']) - 1
+    global kb_list
+    kb_number = int(callback_data['kb_number'])
     if kb_number == 0:
         await  query.answer()
     else:

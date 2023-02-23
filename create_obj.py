@@ -16,8 +16,12 @@ load_dotenv()
 storage = MemoryStorage()
 bot = Bot(token=os.getenv("TOKEN"), parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
-
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
+if os.getenv('DEBUG'):
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(asctime)s %(levelname)s %(message)s")
+else:
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s %(levelname)s %(message)s")
 my_logger = logging.getLogger(__name__)
 my_logger.addHandler(logging.StreamHandler(sys.stdout))
 my_logger.addFilter(CustomFilter())
