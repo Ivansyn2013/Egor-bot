@@ -10,7 +10,7 @@ services:
       - "./ssl/nginx_key.key:/etc/ssl/private/nginx_key.key"
       - "./ssl/nginx_cert.pem:/etc/ssl/certs/nginx_cert.pem"
         # create ssl certs
-        #openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx_test.key -out /etc/ssl/certs/nginx_test.crt
+        #https://core.telegram.org/bots/self-signed
     depends_on:
       - bot
       - db
