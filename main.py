@@ -19,6 +19,7 @@ async def on_startup(dp):
     print('Бот загрузился')
     print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
     db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
+    print('Переменная DEBUG =' + str(DEBUG))
     if not DEBUG:
         await bot.set_webhook(WEBHOOK_URL)
 
