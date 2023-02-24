@@ -5,8 +5,13 @@ services:
     container_name: nginx_egor_bot
     ports:
      - "443:443"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     volumes:
-      - "./nginx.confd/nginx-https.conf:/etc/nginx/nginx.conf"
+      - "./nginx.confd/nginx-https.conf:/etc/nginx/conf.d/default.conf"
       - "./ssl/nginx_key.key:/etc/ssl/private/nginx_key.key"
       - "./ssl/nginx_cert.pem:/etc/ssl/certs/nginx_cert.pem"
         # create ssl certs
