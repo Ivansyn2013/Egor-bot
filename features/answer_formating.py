@@ -34,5 +34,5 @@ def get_answer_str(response: dict):
 
         return f'{answer}'
     else:
-        raise Exception(f'Ошибка получения ответа запроса, неправльная длинна: {len(r)}')
+        raise Exception(f'Ошибка получения ответа запроса, неправльная длина: {len(r)}')
         return None
