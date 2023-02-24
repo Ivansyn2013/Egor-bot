@@ -47,7 +47,7 @@ admin.register_handlers_admin(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
-if DEBUG:
+if not DEBUG:
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
                            on_shutdown=on_shutdown)
 
