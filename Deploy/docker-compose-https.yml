@@ -6,7 +6,7 @@ services:
     ports:
      - "443:443"
     volumes:
-      - "./nginx.confd/nginx-https.conf:/etc/nginx/conf.d/default.conf"
+      - "./nginx.confd/nginx-https.conf:/etc/nginx/nginx.conf"
       - "./ssl/nginx_key.key:/etc/ssl/private/nginx_key.key"
       - "./ssl/nginx_cert.pem:/etc/ssl/certs/nginx_cert.pem"
         # create ssl certs
