@@ -157,10 +157,15 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
 
                 search_dict = await db_mysql_all_products()
 
-                search_option_list = get_close_matches(f'{data["search_text"]}',
-                                                       list(search_dict.keys()),
-                                                       n=5, cutoff=0.5)
-                print(search_option_list)
+                #поиск через библиотеку diffflib
+                # search_option_list = get_close_matches(f'{data["search_text"]}',
+                #                                        list(search_dict.keys()),
+                #                                        n=5, cutoff=0.5)
+                #
+                search_option_list = await my_fuzzy_search(list(search_dict.keys()),
+                                                     f'{data["search_text"]}')
+
+                logging.debug(search_option_list)
                 search_dict_ready = {x: search_dict[x] for x in search_dict
                                      if x in search_option_list}
                 data['bd_dict'] = search_dict_ready

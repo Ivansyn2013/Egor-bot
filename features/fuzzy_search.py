@@ -12,4 +12,9 @@ async def my_fuzzy_search(search: list, desired: str):
         result.append((score, iteam))
     if not result:
         return None
-    return sorted(result, reverse=True)
+    result = [x[1] for x in sorted(result, reverse=True)]
+    return result if len(result) < 5 else result[:4]
+
+
+if __name__ == "__main__":
+    print(my_fuzzy_search())
