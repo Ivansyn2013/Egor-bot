@@ -18,6 +18,7 @@ from inline_butn import get_product_list_kb
 from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import inline_buttons_gen_category
 from keybords import kb_search, kb_client
+from features import my_fuzzy_search
 
 kb_list = []
 
@@ -290,8 +291,8 @@ async def product_list_enter(query: types.CallbackQuery,
         )
         await query.answer()
     except exceptions.BadRequest as error:
-        logging.CRITICAL('No photo in requst from DB from product_list_enter function')
-        logging.CRITICAL(f'{error}')
+        logging.critical('No photo in requst from DB from product_list_enter function')
+        logging.critical(f'{error}')
         await bot.send_message(
             query.from_user.id,
             f'{get_answer_str(res)}',
