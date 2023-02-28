@@ -205,8 +205,7 @@ async def db_mysql_update_photo(id, photo):
 
 
 if __name__ == '__main__':
-    # res = db_mysql_search_product_id('Перловка')
-    # print(res[-1])
+
     def mysql_connector_test(*id):
         '''test func '''
         try:

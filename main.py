@@ -1,11 +1,12 @@
+import logging
 import os
 
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
 from colorama import Fore, Style
 from dotenv import load_dotenv
+
 from create_obj import dp, db_test_connect, bot
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 load_dotenv()
 
@@ -49,10 +50,12 @@ admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
 if DEBUG:
+    logging.warning('Режим pollong')
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
                            on_shutdown=on_shutdown)
 
 else:
+    logging.warning('Режим webhook')
     start_webhook(
         dispatcher=dp,
         webhook_path='/',

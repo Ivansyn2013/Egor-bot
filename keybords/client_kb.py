@@ -29,4 +29,4 @@ kb_search = ReplyKeyboardMarkup(resize_keyboard=True,
 #.row(but1,but2...) медот добавляет все кнопки в строку
 
 kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
-kb_search.add(search_b1).add(search_b2)
+kb_search.add(search_b2)
