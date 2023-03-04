@@ -52,6 +52,10 @@ services:
   db:
     image: mysql:latest
     container_name: db_mysql_egor
+    ##test start
+    ports:
+      - "49154:3306"
+    ##test start
     expose:
       - "3300"
     env_file:
