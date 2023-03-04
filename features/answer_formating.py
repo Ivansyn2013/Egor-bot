@@ -33,8 +33,12 @@ def get_answer_str(response: dict):
     if r == None:
         return None
     elif 4 > len(r['Доза']) > 0 :
+
         for inx in range(len(list(r.values())[0])):
-            answer = f'<code>{answer}{dose_str[inx]} {one_srt_answer(r,inx)}\n </code>'
+            dangeros = r['color_id'][inx] - 1
+            answer = f'<code>{answer}{dose_str[dangeros]}' \
+                     f' {one_srt_answer(r,inx)}\n </code>'
+
         if r["Примечание"][0] is not None:
             answer = answer + f'<i>{r["Примечание"][0]}</i>'
 
