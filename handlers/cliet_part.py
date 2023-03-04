@@ -18,6 +18,7 @@ from inline_butn import get_product_list_kb
 from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import inline_buttons_gen_category
 from keybords import kb_search, kb_client
+from features import my_fuzzy_search
 
 kb_list = []
 
@@ -32,10 +33,13 @@ class FSMSearch(StatesGroup):
 
 
 async def cancel_search_handler(message: types.Message, state: FSMContext):
-    # current_state = await state.get_state()
-    # if current_state is None:
-    #     await message.reply('Выход',
-    #                         reply_markup=kb_client)
+    '''
+    function for canceling state
+    :param message:
+    :param state: FSMContext
+    :return: finish state
+    '''
+
     await state.finish()
     await message.reply('Команда отмены: ok',
                         reply_markup=kb_client)
@@ -43,10 +47,15 @@ async def cancel_search_handler(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(commands=['start', 'help'])
 async def command_start(message: types.Message):
+    '''
+    answer for none found questions
+    :param message:
+    :return: message + keyborad
+    '''
     try:
         await bot.send_message(message.from_user.id,
                                'Привет!!!\n',
-                                reply_markup=kb_client)
+                               reply_markup=kb_client)
         await message.delete()
     except:
         await message.reply('Напишите боту в ЛС')
@@ -54,6 +63,12 @@ async def command_start(message: types.Message):
 
 # @dp.message_handler(commands=['Поиск'])
 async def command_search(message: types.Message):
+    '''
+    fubction to start search in products
+    :param message:
+    :return: message with keyboard
+    '''
+
     await bot.send_message(message.from_user.id, 'Поиск продуктов',
                            reply_markup=kb_search)
 
@@ -69,6 +84,10 @@ async def start_searching(message: types.Message):
 
 # поиск по категориям
 async def start_category_search(message: types.Message):
+    """
+    :param message:
+    :return: message with inline keyboard of category products
+    """
     await message.reply('Категории продуктов',
                         reply_markup=await inline_buttons_gen_category())
 
@@ -138,10 +157,15 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
 
                 search_dict = await db_mysql_all_products()
 
-                search_option_list = get_close_matches(f'{data["search_text"]}',
-                                                       list(search_dict.keys()),
-                                                       n=5, cutoff=0.5)
-                print(search_option_list)
+                #поиск через библиотеку diffflib
+                # search_option_list = get_close_matches(f'{data["search_text"]}',
+                #                                        list(search_dict.keys()),
+                #                                        n=5, cutoff=0.5)
+                #
+                search_option_list = await my_fuzzy_search(list(search_dict.keys()),
+                                                     f'{data["search_text"]}')
+
+                logging.debug(search_option_list)
                 search_dict_ready = {x: search_dict[x] for x in search_dict
                                      if x in search_option_list}
                 data['bd_dict'] = search_dict_ready
@@ -162,8 +186,8 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                 if all(map(lambda x: x is None, res.get('image'))):
                     await message.delete()
                     await bot.send_message(message.from_user.id,
-                                            f'{get_answer_str(res)}',
-                                            parse_mode='html',
+                                           f'{get_answer_str(res)}',
+                                           parse_mode='html',
                                            )
                     await state.finish()
 
@@ -184,7 +208,13 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
 async def search_callback(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
                           state=FSMContext):
-    ''''''
+    '''
+
+    :param query: CallbackQuery
+    :param callback_data: cd_data.filter(action='search')
+    :param state: FSMSearch.callback_search_state
+    :return: inline buttons or product cart
+    '''
     async with state.proxy() as data:
         # print(data['bd_dict'])
         # print(callback_data['bd_id'])
@@ -266,14 +296,15 @@ async def product_list_enter(query: types.CallbackQuery,
         )
         await query.answer()
     except exceptions.BadRequest as error:
-        logging.CRITICAL('No photo in requst from DB from product_list_enter function')
-        logging.CRITICAL(f'{error}')
+        logging.critical('No photo in requst from DB from product_list_enter function')
+        logging.critical(f'{error}')
         await bot.send_message(
             query.from_user.id,
             f'{get_answer_str(res)}',
             parse_mode='html'
         )
         await query.answer()
+
 
 # action back and next
 async def product_list_callback_next(query: types.CallbackQuery,

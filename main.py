@@ -1,11 +1,12 @@
+import logging
 import os
 
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
 from colorama import Fore, Style
 from dotenv import load_dotenv
+
 from create_obj import dp, db_test_connect, bot
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 load_dotenv()
 
@@ -19,7 +20,9 @@ async def on_startup(dp):
     print('Бот загрузился')
     print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
     db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
-    if not DEBUG:
+    print('Переменная DEBUG =' + str(DEBUG))
+    if  DEBUG == False:
+        print('set.webhook')
         await bot.set_webhook(WEBHOOK_URL)
 
     global kb_list
@@ -47,10 +50,12 @@ admin.register_handlers_admin(dp)
 other.register_handlers_other(dp)
 
 if DEBUG:
+    logging.warning('Режим pollong')
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
                            on_shutdown=on_shutdown)
 
 else:
+    logging.warning('Режим webhook')
     start_webhook(
         dispatcher=dp,
         webhook_path='/',
