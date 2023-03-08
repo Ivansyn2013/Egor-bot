@@ -6,3 +6,11 @@ venv
 .idea
 shell_scripts
 win_bot_start.bat
+log.txt
+egor_bot.db
+test
+.env
+/.env
+/Deploy/db_dump/
+/Deploy/ssl/
+/tmp/tmp.jpg
