@@ -1,17 +1,67 @@
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-from aiogram.utils import executor
-
+import logging
 import os
 
-bot = Bot(token=os.getenv("TOKEN"))
-dp = Dispatcher(bot)
+from aiogram.utils import executor
+from aiogram.utils.executor import start_webhook
+from colorama import Fore, Style
+from dotenv import load_dotenv
 
-@dp.message_handler()
-async def echo_send(message : types.Message):
-    await message.answer(message.text)
-    await message.reply(message.text)
-    await bot.send_message(message.from_user.id, message.text)
+from create_obj import dp, db_test_connect, bot
+
+load_dotenv()
+
+DEBUG = os.getenv('DEBUG')
+WEBAPP_HOST = os.getenv("WEBAPP_HOST")
+WEBAPP_PORT = os.getenv("WEBAPP_PORT")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 
-executor.start_polling(dp, skip_updates=True)
+async def on_startup(dp):
+    print('Бот загрузился')
+    print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
+    db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
+    print('Переменная DEBUG =' + str(DEBUG))
+    if  DEBUG == False:
+        print('set.webhook')
+        await bot.set_webhook(WEBHOOK_URL)
+
+    global kb_list
+
+
+async def on_shutdown(dp):
+    # logging.warning('Shutting down..')
+    # insert code here to run it before shutdown
+    # Remove webhook (not acceptable in some cases)
+    await bot.delete_webhook()
+    # Close DB connection (if used)
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+    #logging.warning('Bye!')
+
+
+from handlers import cliet_part, admin, other
+
+cliet_part.register_handlers_client(dp)
+
+admin.register_handlers_admin(dp)
+
+# для записи сообщений которые не ловятся хенжлерами
+# пустой хендлер должен быть последним
+other.register_handlers_other(dp)
+
+if DEBUG:
+    logging.warning('Режим pollong')
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
+                           on_shutdown=on_shutdown)
+
+else:
+    logging.warning('Режим webhook')
+    start_webhook(
+        dispatcher=dp,
+        webhook_path='/',
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
