@@ -39,11 +39,13 @@ async def on_shutdown(dp):
     #logging.warning('Bye!')
 
 
-from handlers import cliet_part, admin, other
+from handlers import cliet_part, admin, other, inline_mode
 
 cliet_part.register_handlers_client(dp)
 
 admin.register_handlers_admin(dp)
+
+inline_mode.register_handlers_inline(dp)
 
 # для записи сообщений которые не ловятся хенжлерами
 # пустой хендлер должен быть последним

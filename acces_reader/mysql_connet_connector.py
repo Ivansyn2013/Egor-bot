@@ -15,7 +15,7 @@ DB_HOST = os.getenv('DB_HOST')
 
 
 async def db_mysql_request(request: str):
-    '''Function connecting to mysql db and return dict with value or None if seach
+    '''Function connecting to mysql db and return dict with all values for product or None if seach
     result is empty or raise an Error'''
 
     try:
@@ -70,8 +70,8 @@ async def db_mysql_all_products() -> dict:
 
     request = r'SELECT `id`, `Название продукта` FROM Common'
 
-    print(BD_PASS)
-    print(DB_HOST)
+    #print(BD_PASS)
+    #print(DB_HOST)
     try:
         with connect(
                 host=DB_HOST,

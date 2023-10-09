@@ -14,3 +14,5 @@ test
 /Deploy/db_dump/
 /Deploy/ssl/
 /tmp/tmp.jpg
+.env*
+/.env_test
