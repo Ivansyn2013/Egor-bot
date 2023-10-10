@@ -15,7 +15,9 @@ DB_HOST = os.getenv('DB_HOST')
 
 
 async def db_mysql_request(request: str):
-    '''Function connecting to mysql db and return dict with all values for product or None if seach
+    '''Function connecting to mysql db, search product by exact name of product
+     and return dict with all values for  product or  None if
+    seach
     result is empty or raise an Error'''
 
     try:
