@@ -149,11 +149,6 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                                        'То что Вы искали, я не нашел, но может быть Вам '
                                        'подойдет что-то из этого:')
 
-                # await FSMSearch.option_search.set()
-                # print(await state.get_state())
-                # await search_options_db(message,FSMSearch.option_search)
-
-                # await bot.send_message(message.from_user.id, f'{data["search_text"]}')
 
                 search_dict = await db_mysql_all_products()
 
@@ -195,7 +190,6 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                     image_data = res['image'][0]
                     res.pop('image')
                     res.pop('Картинка')
-                    print(res.items())
                     await message.delete()
                     await bot.send_photo(message.from_user.id,
                                          image_data,
