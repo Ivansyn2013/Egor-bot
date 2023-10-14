@@ -17,3 +17,7 @@ test
 /tmp/tmp.jpg
 .env*
 /.env_test
+
+*output_1
+/acces_reader/output_1/
+*/__pycache__/*
