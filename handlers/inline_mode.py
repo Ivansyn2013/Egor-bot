@@ -42,7 +42,7 @@ async def inline_handler(query: types.InlineQuery):
     responce = []
 
     for name, product_id in search_dict_ready.items():
-        url1='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_DvKa3Xd0JcA1f4zlaNXN78zJ4HvqnH5CohpBQTYUA&s'
+        url1=f'https://fodmap.moscow/media/{product_id}.png'
 
 
         chat = await bot.get_chat(query.from_user.id)
