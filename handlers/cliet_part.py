@@ -187,12 +187,12 @@ async def search_go_to_db(message: types.Message, state=FSMContext):
                     await state.finish()
 
                 else:
-                    image_data = res['image'][0]
-                    res.pop('image')
-                    res.pop('Картинка')
+                    #image_data = res['image'][0]
+                    #res.pop('image')
+                    #res.pop('Картинка')
                     await message.delete()
                     await bot.send_photo(message.from_user.id,
-                                         image_data,
+                                         'Пока нет',
                                          f'{get_answer_str(res)}',
                                          parse_mode='html'
                                          )
@@ -224,13 +224,13 @@ async def search_callback(query: types.CallbackQuery,
         await bot.send_message(query.from_user.id, 'Будем еще искать?')
 
     else:
-        image_data = res['image'][0]
-        res.pop('image')
-        res.pop('Картинка')
+        #image_data = res['image'][0]
+        #res.pop('image')
+        #res.pop('Картинка')
 
         await bot.send_photo(
             query.from_user.id,
-            image_data,
+            'Пока нет',
             f'{get_answer_str(res)}',
             parse_mode='html'
         )
@@ -278,13 +278,14 @@ async def product_list_enter(query: types.CallbackQuery,
         await query.answer()
 
     else:
-        image_data = res['image'][0]
-        res.pop('image')
-        res.pop('Картинка')
+        #image_data = res['image'][0]
+        #res.pop('image')
+        #res.pop('Картинка')
+        d= ''
     try:
         await bot.send_photo(
             query.from_user.id,
-            image_data,
+            'ПОка нет',
             f'{get_answer_str(res)}',
             parse_mode='html'
         )

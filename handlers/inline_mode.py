@@ -42,8 +42,6 @@ async def inline_handler(query: types.InlineQuery):
             url1=f'https://fodmap.moscow/media/{product_id}.png'
             id_code = str(uuid4())
             result = await db_mysql_request(name) or str('Не найдено')
-            result.pop('image')
-            #imade_data = result.get('image')[0]
             product_name = result['Название продукта'][0].replace('(', '\(').replace(')', '\)')
             mark_probe = f"[{product_name}](https://fodmap.moscow/media/{product_id}.png)"
             #вариант через Article
