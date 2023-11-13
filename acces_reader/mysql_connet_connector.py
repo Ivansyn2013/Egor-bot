@@ -35,9 +35,10 @@ async def db_mysql_request(request: str):
                                 fr'JOIN dose ON Common.id = dose.common_id ' \
                                 fr'JOIN fodmap ON Common.fodmap_id = fodmap.id ' \
                                 fr'JOIN Color ON dose.color_id = Color.id ' \
-                                fr'LEFT JOIN jpeg_images ON jpeg_images.common_id =' \
-                                fr'Common.id ' \
-                                fr"WHERE `Название продукта` = '{request}'"
+                                fr'WHERE `Название продукта` = "{request}"'
+        ##fr'LEFT JOIN jpeg_images ON jpeg_images.common_id =' \
+        ##fr'Common.id ' \ удалены изображения
+
 
             display_answer = fr'SELECT `Отображение` FROM Color'
             with connection.cursor() as cr:
@@ -72,8 +73,6 @@ async def db_mysql_all_products() -> dict:
 
     request = r'SELECT `id`, `Название продукта` FROM Common'
 
-    #print(BD_PASS)
-    #print(DB_HOST)
     try:
         with connect(
                 host=DB_HOST,
@@ -82,7 +81,6 @@ async def db_mysql_all_products() -> dict:
                 password=BD_PASS,
                 database=MYSQL_DATABASE
         ) as connection:
-            print('Соединение с базой из all_produts')
             logging.info('Соединение с базой из all_produts')
             with connection.cursor() as cr:
                 cr.execute(request)
