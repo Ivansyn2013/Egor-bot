@@ -39,7 +39,7 @@ async def inline_handler(query: types.InlineQuery):
         responce = []
 
         for name, product_id in search_dict_ready.items():
-            url1=f'https://fodmap.moscow/media/{product_id}.png'
+            url_thumb=f'https://fodmap.moscow/media/thumbnails/{product_id}.png'
             id_code = str(uuid4())
             result = await db_mysql_request(name) or str('Не найдено')
             product_name = result['Название продукта'][0].replace('(', '\(').replace(')', '\)')
@@ -57,9 +57,9 @@ async def inline_handler(query: types.InlineQuery):
                     parse_mode='MarkdownV2',
                 ),
                     #здесь ссылка на картинку
-                thumb_url=url1,
-                thumb_width=100,  # Set the width of the thumbnail image
-                thumb_height=100
+                thumb_url=url_thumb,
+                thumb_width=128,  # Set the width of the thumbnail image
+                thumb_height=128
             )
             )
 
