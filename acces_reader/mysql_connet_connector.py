@@ -35,10 +35,8 @@ async def db_mysql_request(request: str):
                                 fr'JOIN dose ON Common.id = dose.common_id ' \
                                 fr'JOIN fodmap ON Common.fodmap_id = fodmap.id ' \
                                 fr'JOIN Color ON dose.color_id = Color.id ' \
+                                fr'LEFT JOIN jpeg_images ON jpeg_images.common_id = Common.id ' \
                                 fr'WHERE `Название продукта` = "{request}"'
-        ##fr'LEFT JOIN jpeg_images ON jpeg_images.common_id =' \
-        ##fr'Common.id ' \ удалены изображения
-
 
             display_answer = fr'SELECT `Отображение` FROM Color'
             with connection.cursor() as cr:

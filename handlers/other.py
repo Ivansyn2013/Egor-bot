@@ -2,13 +2,14 @@ import json
 import string
 
 from aiogram import types
-from aiogram.dispatcher import Dispatcher
-from aiogram.dispatcher.filters import Text
+from aiogram import Dispatcher
+#from aiogram.dispatcher.filters import Text
 from aiogram.utils.markdown import hlink, link
 
 from create_obj import  bot
 from keybords import kb_client, kb_answer_and_qusetion
 from features.answer_and_question import STR_ANSWER_AND_QUESTION
+from aiogram import F
 
 
 filter_list = list(STR_ANSWER_AND_QUESTION.keys())
@@ -71,16 +72,16 @@ async def donat_handler(message: types.Message):
 
 
 def register_handlers_other(dp: Dispatcher):
-    dp.register_message_handler(answer_and_qusetion, Text(equals=filter_list,
+    dp.update.register(answer_and_qusetion, F.text(equals=filter_list,
                                                ignore_case=True))
 
 
-    dp.register_message_handler(donat_handler, Text(
+    dp.update.register(donat_handler, F.text(
                                                     equals=['Поддержать '
                                                             'проект'],
                                                ignore_case=True))
 
-    dp.register_message_handler(start_mes)
+    dp.update.register(start_mes)
 #    dp.register_message_handler(get_photo_mes)
 
 

@@ -6,16 +6,19 @@ import sys
 from mysql.connector import connect
 from features import CustomFilter
 from aiogram import Bot
-from aiogram.contrib.fsm_storage.memory import MemoryStorage  # хранилище в ОП
-from aiogram.dispatcher import Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage  # хранилище в ОП
+from aiogram.dispatcher.dispatcher import Dispatcher
 from aiogram import types
 from dotenv import load_dotenv
-from aiogram.contrib.middlewares.logging import LoggingMiddleware, LoggingFilter
+from aiogram.enums import ParseMode
+from aiogram import Router
 
 load_dotenv()
 storage = MemoryStorage()
-bot = Bot(token=os.getenv("TOKEN"), parse_mode=types.ParseMode.HTML)
-dp = Dispatcher(bot, storage=storage)
+bot = Bot(token=os.getenv("TOKEN"), parse_mode=ParseMode.HTML)
+dp = Dispatcher()
+router = Router()
+dp.include_router(router)
 if os.getenv('DEBUG'):
     logging.basicConfig(level=logging.DEBUG,
                         format="%(asctime)s %(levelname)s %(message)s")
@@ -26,7 +29,7 @@ my_logger = logging.getLogger(__name__)
 my_logger.addHandler(logging.StreamHandler(sys.stdout))
 my_logger.addFilter(CustomFilter())
 
-dp.middleware.setup(LoggingMiddleware(logger=my_logger))
+#dp.middleware.setup(LoggingMiddleware(logger=my_logger))
 
 
 

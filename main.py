@@ -1,8 +1,7 @@
+import asyncio
 import logging
 import os
 
-from aiogram.utils import executor
-from aiogram.utils.executor import start_webhook
 from colorama import Fore, Style
 from dotenv import load_dotenv
 
@@ -51,19 +50,28 @@ inline_mode.register_handlers_inline(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
-if DEBUG:
-    logging.warning('Режим pollong')
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
-                           on_shutdown=on_shutdown)
 
-else:
-    logging.warning('Режим webhook')
-    start_webhook(
-        dispatcher=dp,
-        webhook_path='/',
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
-    )
+async def main():
+    if DEBUG:
+        logging.warning('Режим pollong')
+        await dp.start_polling(
+            bot,
+            skip_updates=True,
+            on_startup=on_startup,
+            on_shutdown=on_shutdown
+        )
+
+    else:
+        logging.warning('Режим webhook')
+        start_webhook(
+            dispatcher=dp,
+            webhook_path='/',
+            on_startup=on_startup,
+            on_shutdown=on_shutdown,
+            skip_updates=True,
+            host=WEBAPP_HOST,
+            port=WEBAPP_PORT,
+        )
+
+if __name__ == '__main__':
+    asyncio.run(main())

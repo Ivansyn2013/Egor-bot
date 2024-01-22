@@ -1,14 +1,23 @@
 from aiogram import Dispatcher
 from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+#from aiogram.filters import Text
+from aiogram.fsm.state import State, StatesGroup
 import os
 from dotenv import load_dotenv
 from features.author_messages import AUTHOR_MESSAGES
 from create_obj import bot
 from keybords import admin_kb_check
 from acces_reader import db_mysql_search_product_id, db_mysql_update_photo
+from aiogram.filters import Command, Filter
+from aiogram import F
+
+class MyFilter(Filter):
+    def __init__(self, *args, **kwargs) -> None:
+        self.my_text = args
+
+    async def __call__(self, message: types.Message) -> bool:
+        return message.text == self.my_text
 
 load_dotenv()
 AUTHOR_PASS = os.getenv('AUTHOR_PASS')
@@ -213,24 +222,24 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Команда отмены: ok')
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(make_changes_command, commands='moderator')
-    dp.register_message_handler(check_author, state=FSMAdmin.authorized)
-    dp.register_message_handler(set_name, state=FSMAdmin.name)
-    dp.register_message_handler(set_category, state=FSMAdmin.category)
-    dp.register_message_handler(set_description, state=FSMAdmin.description)
-    dp.register_message_handler(set_search_product_id, state=FSMAdmin.search_product_id)
-    dp.register_message_handler(set_photo, content_types=['photo'], state=FSMAdmin.photo)
-    dp.register_message_handler(set_fodmap, state=FSMAdmin.fodmap)
-    dp.register_message_handler(update_photo,
-                                state=FSMAdmin.update_photo_state,
+    dp.message.register(make_changes_command, Command('moderator'), MyFilter())
+    dp.message.register(check_author, F.state == FSMAdmin.authorized)
+    dp.message.register(set_name, F.state == FSMAdmin.name)
+    dp.message.register(set_category, F.state == FSMAdmin.category)
+    dp.message.register(set_description, F.state == FSMAdmin.description)
+    dp.message.register(set_search_product_id, F.state == FSMAdmin.search_product_id)
+    dp.message.register(set_photo, F.state == FSMAdmin.photo, F.content == ['photo'])
+    dp.message.register(set_fodmap, F.state == FSMAdmin.fodmap)
+    dp.message.register(update_photo,
+                                F.state == FSMAdmin.update_photo_state,
                                 #commands=['OK']
                                 )
-    dp.register_message_handler(update_photo_cancel, state=FSMAdmin.update_photo_state,
-                                commands=['NOT OK'])
+    dp.update.register(update_photo_cancel, F.state == FSMAdmin.update_photo_state,
+                                Command('NOT OK'), MyFilter())
 
 
-    dp.register_message_handler(load_description, state=FSMAdmin.description)
+    dp.update.register(load_description, F.state == FSMAdmin.description)
 
-    dp.register_message_handler(cancel_handler, Text(equals='отмена',
-                                                     ignore_case=True), state="*")
-    dp.register_message_handler(cancel_handler, state="*", commands='отмена')
+    dp.update.register(cancel_handler, F.text(equals='отмена',
+                                                     ignore_case=True))
+    dp.update.register(cancel_handler, Command('отмена'), MyFilter())
