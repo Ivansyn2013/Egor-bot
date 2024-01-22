@@ -1,18 +1,20 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-button_load = KeyboardButton('/Load')
-button_delete = KeyboardButton("/Delete")
-button_delete = KeyboardButton("/Show")
-button_ok = KeyboardButton("/OK")
-button_notok = KeyboardButton("/NOT OK")
+button_load = KeyboardButton(text='/Load')
+button_delete = KeyboardButton(text="/Delete")
+button_show = KeyboardButton(text="/Show")
+button_ok = KeyboardButton(text="/OK")
+button_notok = KeyboardButton(text="/NOT OK")
 
-button_case_admin = ReplyKeyboardMarkup(resize_keyboard=True,
-                                        one_time_keyboard=True
-                                        ).add(button_load) \
-    .add(button_delete) \
-    .add(button_delete)
+buttons = [button_ok, button_delete, button_show, button_notok]
+button_case_admin = ReplyKeyboardMarkup(
+    keyboard=[buttons],
+    resize_keyboard=True,
+    one_time_keyboard=True
+                                        )
 
-admin_kb_check = ReplyKeyboardMarkup(resize_keyboard=True,
-                                     one_time_keyboard=True
-                                     ).add(button_ok) \
-    .add(button_notok)
+admin_kb_check = ReplyKeyboardMarkup(
+    keyboard=[buttons],
+    resize_keyboard=True,
+    one_time_keyboard=True
+                                     )

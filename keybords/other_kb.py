@@ -1,11 +1,18 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from features.answer_and_question import STR_ANSWER_AND_QUESTION
 
-kb_answer_and_qusetion = ReplyKeyboardMarkup(row_width=1,resize_keyboard=True)
-b_quit = KeyboardButton('Назад')
 
+b_quit = KeyboardButton(text='Назад')
+
+buttons = []
 for quest, answer in STR_ANSWER_AND_QUESTION.items():
-    b = KeyboardButton(f'{quest}')
-    kb_answer_and_qusetion.add(b)
+    b = KeyboardButton(text=f'{quest}')
+    buttons.append(b)
 
-kb_answer_and_qusetion.add(b_quit)
+buttons.append(b_quit)
+
+kb_answer_and_qusetion = ReplyKeyboardMarkup(
+    keyboard=[buttons],
+    row_width=1,
+    resize_keyboard=True
+)
