@@ -41,6 +41,7 @@ try:
                               password=os.getenv('MYSQL_PASSWORD'),
                               database=os.getenv('MYSQL_DATABASE'),
                               ).is_connected()
+    logging.info('Connected to mysql database')
 
 except Exception as e:
     print('Error in db connecting')

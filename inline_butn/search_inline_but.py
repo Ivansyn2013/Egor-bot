@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 import uuid
 from aiogram.filters.callback_data import CallbackData
 from acces_reader.mysql_connet_connector import db_mysql_category_request
@@ -10,7 +11,7 @@ class MyCallbackData(CallbackData, prefix='my'):
     id: str
     bd_id: str
     action: str
-    kb_number: str
+    kb_number: int
 
 
 async def inline_button_gen(search_dict_ready: dict) -> InlineKeyboardMarkup:
@@ -19,7 +20,7 @@ async def inline_button_gen(search_dict_ready: dict) -> InlineKeyboardMarkup:
 
     global cd_data
 
-    inline_but_kb = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
+    inline_but_kb = InlineKeyboardMarkup(row_width=3)
     sl = search_dict_ready
 
     for name, id in sl.items():
@@ -28,8 +29,9 @@ async def inline_button_gen(search_dict_ready: dict) -> InlineKeyboardMarkup:
                                      id=str(uuid.uuid4()),
                                      action='search',
                                      bd_id=id,
-                                     kb_number='s_s'
-                                 ),
+                                     kb_number=0,
+                                     button=''
+                                 ).pack(),
                                  )
         inline_but_kb.add(b)
     return inline_but_kb
@@ -44,7 +46,7 @@ async def inline_buttons_gen_category() -> InlineKeyboardMarkup:
     if c_d is None:
         return None
 
-    inline_but_kb = InlineKeyboardMarkup(row_width=1, resize_keyboard=True)
+
     buttons_list = []
 
     for name, id in c_d.items():
@@ -55,9 +57,13 @@ async def inline_buttons_gen_category() -> InlineKeyboardMarkup:
                                      id=str(uuid.uuid4()),
                                      action='category',
                                      bd_id=id,
-                                     kb_number='s_s'
+                                     kb_number=0,
+                                     button=f'',
                                  ).pack(),
                                  )
         buttons_list.append(b)
-    inline_but_kb.add(*buttons_list)
+    inline_but_kb = InlineKeyboardMarkup(inline_keyboard=[buttons_list[i:i + 2] for i in range(0,
+                                                                                               len(buttons_list),
+                                                                                               2)])
+
     return inline_but_kb
