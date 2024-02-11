@@ -19,13 +19,22 @@ search_b2 = types.KeyboardButton(text='Выйти из поиска')
 #one_time_keyboard=True для одноразового показа, но клавиатуру можно вернуть для
 # полного удаления нужно в хендлере прописать reply_markup=ReplyKeyboardRemove()
 kb_client = types.ReplyKeyboardMarkup(
-    keyboard=[[b1, b2]],
+    keyboard=[[b1],
+              [b2],
+              [b3],
+              [b4],
+              [b5]
+              ],
     resize_keyboard=True,
-    input_field_placeholder="Выберите способ подачи"
+    input_field_placeholder="Выберите способ подачи",
+
                                 )
 
 kb_search = types.ReplyKeyboardMarkup(
-    keyboard=[[search_b1, search_b2]],
+    keyboard=[
+        [search_b1],
+        [search_b2],
+    ],
     resize_keyboard=True,
     input_field_placeholder="Выберите способ подачи"
                                 )

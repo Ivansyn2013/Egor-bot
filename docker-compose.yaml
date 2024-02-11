@@ -32,6 +32,10 @@ services:
       - "3306"
     env_file:
       - ".env"
+#    только для тестов
+    environment:
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
       - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
 

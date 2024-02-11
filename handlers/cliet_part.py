@@ -8,6 +8,7 @@ from aiogram import exceptions
 from aiogram import types
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.enums.parse_mode import ParseMode
 
 from acces_reader import db_mysql_request, db_mysql_all_products, \
     db_mysql_category_request
@@ -17,9 +18,10 @@ from features import my_fuzzy_search
 from handlers.admin import MyFilter
 from inline_butn import get_product_list_kb
 from inline_butn import inline_button_gen
-from inline_butn.product_list import MyCallbackData
+from inline_butn.search_inline_but import MyCallbackData
 from inline_butn.search_inline_but import inline_buttons_gen_category
 from keybords import kb_search, kb_client
+from create_obj import router
 
 kb_list = []
 
@@ -43,7 +45,7 @@ async def cancel_search_handler(message: types.Message, state: FSMContext):
     :return: finish state
     '''
 
-    await state.finish()
+    await state.clear()
     await message.reply('Команда отмены: ok',
                         reply_markup=kb_client)
 
@@ -77,10 +79,11 @@ async def command_search(message: types.Message):
 
 
 # commands=['Искать']
-async def start_searching(message: types.Message):
+#@router.message(F.text == 'Поиска')
+async def start_searching(message: types.Message, state: FSMContext):
     '''function start search and redirect message to {search_go_to_db} '''
     if message.text == 'Поиск':
-        await FSMSearch.fs_search.set()
+        await state.set_state(FSMSearch.fs_search)
         await message.reply('Введи название продукта',
                             reply_markup=kb_search)
 
@@ -96,14 +99,15 @@ async def start_category_search(message: types.Message):
 
 
 async def callback_category(query: types.CallbackQuery,
-                            callback_data: typing.Dict[str, str]):
+                            callback_data: MyCallbackData):
     global kb_list
 
     dict_for_kb = {}
-    for but in query.message.reply_markup.inline_keyboard:
-        for context in but:
-            if query.data == context["callback_data"]:
-                category_product_in = context.text
+    for row in query.message.reply_markup.inline_keyboard:
+        for but  in row:
+            if query.data == but.callback_data:
+                category_product_in = but.text
+                break
 
     category_poducts_all = await db_mysql_category_request()
 
@@ -122,88 +126,88 @@ async def callback_category(query: types.CallbackQuery,
 
     kb_list = await get_product_list_kb(dict_for_kb)
 
-    print(len(kb_list))
 
     await query.answer()
-    await query.message.edit_text(f'{context.text}',
+    await query.message.edit_text(f'{category_product_in}',
                                   reply_markup=kb_list[0])
 
 
-async def search_go_to_db(message: types.Message, state=FSMContext):
+async def search_go_to_db(message: types.Message, state: FSMContext):
     if message.text == 'Искать':
         await bot.send_message(message.from_user.id,
                                'Введи название продукта:')
     elif message.text == 'Выйти из поиска':
-        await state.finish()
+        await state.clear()
         await bot.send_message(message.from_user.id,
                                'Отмена поиска',
                                reply_markup=kb_client)
 
     else:
-        async with state.proxy() as data:
-            data['search_text'] = message.text
-
-            res = await db_mysql_request(data['search_text'])
-            print(data['search_text'])
+        data = {}
+        data['search_text'] = message.text
+        await state.update_data(search_text=message.text)
+        res = await db_mysql_request(data['search_text'])
+        #тут логер что ищет пользователь
+        print(data['search_text'])
+        await bot.send_message(message.from_user.id,
+                               'Ищу')
+        if res is None:
             await bot.send_message(message.from_user.id,
-                                   'Ищу')
-            if res is None:
+                                   'То что Вы искали, я не нашел, но может быть Вам '
+                                   'подойдет что-то из этого:')
+
+            search_dict = await db_mysql_all_products()
+
+            # поиск через библиотеку diffflib
+            # search_option_list = get_close_matches(f'{data["search_text"]}',
+            #                                        list(search_dict.keys()),
+            #                                        n=5, cutoff=0.5)
+            #
+            search_option_list = await my_fuzzy_search(list(search_dict.keys()),
+                                                       f'{data["search_text"]}')
+
+            logging.debug(search_option_list)
+            search_dict_ready = {x: search_dict[x] for x in search_dict
+                                 if x in search_option_list}
+            data['bd_dict'] = search_dict_ready
+            if search_dict_ready != {}:
                 await bot.send_message(message.from_user.id,
-                                       'То что Вы искали, я не нашел, но может быть Вам '
-                                       'подойдет что-то из этого:')
+                                       'Возможно вы искали:',
+                                       reply_markup=await inline_button_gen(
+                                           search_dict_ready))
+                await FSMSearch.callback_search_state.set()
+            else:
+                await bot.send_message(message.from_user.id,
+                                       'Ой, ничего похожего\n Попробуй еще раз',
+                                       reply_markup=kb_search)
+                await state.set_state(FSMSearch.fs_search)
 
-                search_dict = await db_mysql_all_products()
 
-                # поиск через библиотеку diffflib
-                # search_option_list = get_close_matches(f'{data["search_text"]}',
-                #                                        list(search_dict.keys()),
-                #                                        n=5, cutoff=0.5)
-                #
-                search_option_list = await my_fuzzy_search(list(search_dict.keys()),
-                                                           f'{data["search_text"]}')
-
-                logging.debug(search_option_list)
-                search_dict_ready = {x: search_dict[x] for x in search_dict
-                                     if x in search_option_list}
-                data['bd_dict'] = search_dict_ready
-                if search_dict_ready != {}:
-                    await bot.send_message(message.from_user.id,
-                                           'Возможно вы искали:',
-                                           reply_markup=await inline_button_gen(
-                                               search_dict_ready))
-                    await FSMSearch.callback_search_state.set()
-                else:
-                    await bot.send_message(message.from_user.id,
-                                           'Ой, ничего похожего\n Попробуй еще раз',
-                                           reply_markup=kb_search)
-                    await FSMSearch.fs_search.set()
-
+        else:
+            if all(map(lambda x: x is None, res.get('image'))):
+                await message.delete()
+                await bot.send_message(message.from_user.id,
+                                       f'{get_answer_str(res)}',
+                                       parse_mode='html',
+                                       )
+                await state.clear()
 
             else:
-                if all(map(lambda x: x is None, res.get('image'))):
-                    await message.delete()
-                    await bot.send_message(message.from_user.id,
-                                           f'{get_answer_str(res)}',
-                                           parse_mode='html',
-                                           )
-                    await state.finish()
-
-                else:
-                    # image_data = res['image'][0]
-                    # res.pop('image')
-                    # res.pop('Картинка')
-                    await message.delete()
-                    await bot.send_photo(message.from_user.id,
-                                         'Пока нет',
-                                         f'{get_answer_str(res)}',
-                                         parse_mode='html'
-                                         )
-                    await state.finish()
+                image_data = types.BufferedInputFile(res['image'][0], filename=f'{data["search_text"]}.jpg')
+                res.pop('image')
+                res.pop('Картинка')
+                await message.delete()
+                await bot.send_photo(message.from_user.id,
+                                     image_data,
+                                     caption=f'{get_answer_str(res)}',
+                                     parse_mode='html'
+                                     )
+                await state.clear()
 
 
 async def search_callback(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
-                          state=FSMContext):
+                          state: FSMContext):
     '''
 
     :param query: CallbackQuery
@@ -222,7 +226,7 @@ async def search_callback(query: types.CallbackQuery,
     if res is None:
         await bot.send_message(query.from_user.id,
                                text="Ничего не найдено")
-        await state.finish()
+        await state.clear()
         await bot.send_message(query.from_user.id, 'Будем еще искать?')
 
     else:
@@ -236,7 +240,7 @@ async def search_callback(query: types.CallbackQuery,
             f'{get_answer_str(res)}',
             parse_mode='html'
         )
-        await FSMSearch.fs_search.set()
+        await state.set_state(FSMSearch.fs_search)
         print(await state.get_state())
 
 
@@ -270,7 +274,7 @@ async def product_list_enter(query: types.CallbackQuery,
     search_dict = await db_mysql_all_products()
 
     request = [x for x, y in search_dict.items()
-               if y == int(callback_data['bd_id'])]
+               if y == int(callback_data.bd_id)]
     res = await db_mysql_request(request[0])
 
     if res is None:
@@ -287,29 +291,29 @@ async def product_list_enter(query: types.CallbackQuery,
     try:
         await bot.send_photo(
             query.from_user.id,
-            photo=image_data,
+            photo=types.BufferedInputFile(image_data, filename=res['Название продукта'][0]),
             # 'ПОка нет',
             caption=f'{get_answer_str(res)}',
-            parse_mode='html',
+            #parse_mode='html',
+            parse_mode=ParseMode.MARKDOWN_V2,
         )
         await query.answer()
-    except exceptions.BadRequest as error:
+    except exceptions.TelegramBadRequest as error:
         logging.critical('No photo in requst from DB from product_list_enter function')
         logging.critical(f'{error}')
         await bot.send_message(
             query.from_user.id,
             f'{get_answer_str(res)}',
-            parse_mode='html'
+            parse_mode=ParseMode.MARKDOWN_V2
         )
         await query.answer()
 
 
 # action back and next
 async def product_list_callback_next(query: types.CallbackQuery,
-                                     callback_data: typing.Dict[str, str]):
-    print(callback_data['kb_number'])
+                                     callback_data: MyCallbackData):
     global kb_list
-    kb_number = int(callback_data['kb_number'])
+    kb_number = int(callback_data.kb_number)
     if kb_number >= len(kb_list) - 1:
         await  query.answer()
     else:
@@ -319,10 +323,9 @@ async def product_list_callback_next(query: types.CallbackQuery,
 
 
 async def product_list_callback_back(query: types.CallbackQuery,
-                                     callback_data: typing.Dict[str, str]):
-    print(callback_data['kb_number'])
+                                     callback_data: MyCallbackData):
     global kb_list
-    kb_number = int(callback_data['kb_number'])
+    kb_number = int(callback_data.kb_number)
     if kb_number == 0:
         await  query.answer()
     else:
@@ -331,47 +334,54 @@ async def product_list_callback_back(query: types.CallbackQuery,
                                       reply_markup=kb_list[kb_number - 1])
 
 
+@router.callback_query(MyCallbackData.filter(F.action == "category"))
+async def test_callback(query: types.CallbackQuery,
+                        #callback_data: MyCallbackData
+                        ):
+    #ss = callback_data
+    print('dsd')
+    await query.answer('test query')
+
 def register_handlers_client(dp: Dispatcher):
-    dp.message.register(command_start, CommandStart)
-    dp.message.register(command_start, Command('start', 'help'), MyFilter())
+
+   #dp.message.register(command_start, Command('start', 'help'), MyFilter())
     dp.message.register(command_author, Command('Авторизация'), MyFilter())
-    #    dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
+    #dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
     dp.message.register(start_searching, F.text(equals=['Поиск'],
                                                 ignore_case=True))
+    dp.message.register(start_searching, F.text == 'Поиск')
+    dp.message.register(command_start, CommandStart())
     dp.message.register(command_product_list,
-                        F.text(
-                            equals=['Список '
-                                    'продуктов'],
-                            ignore_case=True))
-
-    dp.message.register(search_go_to_db, F.state == FSMSearch.fs_search)
+                        F.text == 'Список продуктов')
+    dp.message.register(search_go_to_db, FSMSearch.fs_search)
     #    dp.register_message_handler(search_options_db, state=FSMSearch.option_search)
+    dp.message.register(
+        cancel_search_handler,
+        F.text.in_(['Выйти из поиска', 'Отмена']),
+    )
+
     dp.message.register(cancel_search_handler,
-                        F.text(
-                            equals=['Выйти из поиска',
-                                    'Отмена'],
-                            ignore_case=True),
-                        )
-    dp.message.register(cancel_search_handler,
-                        F.text(equals='отмена',
-                               ignore_case=True),
+                        F.text == 'отмена'
                         )
     dp.message.register(start_category_search,
-                        F.text(equals=['Категории продуктов'],
-                               ignore_case=True
-                               ))
+                        F.text == 'Категории продуктов')
 
-    dp.message.register(search_callback,
+    dp.callback_query.register(search_callback,
                         cd_data.filter(F.action == 'search'),
                         )
     # dp.register_message_handler(command_product_list, Text(equals='Список продуктов',
     #                                                        ignore_case=True))
 
-    dp.message.register(product_list_callback_next,
+    dp.callback_query.register(product_list_callback_next,
                         cd_data.filter(F.action == 'next'))
-    dp.message.register(product_list_callback_back,
+    dp.callback_query.register(product_list_callback_back,
                         cd_data.filter(F.action == 'back'))
-    dp.message.register(product_list_enter,
+    dp.callback_query.register(product_list_enter,
                         cd_data.filter(F.action == 'search_in'))
-    dp.message.register(callback_category,
-                        cd_data.filter(F.action == 'category'))
+
+    dp.callback_query.register(callback_category,
+                        MyCallbackData.filter(F.action == 'category'))
+
+    # dp.callback_query.register(test_callback,
+    #                            )
+

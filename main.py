@@ -53,6 +53,7 @@ other.register_handlers_other(dp)
 
 async def main():
     if DEBUG:
+        logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
         await dp.start_polling(
             bot,
