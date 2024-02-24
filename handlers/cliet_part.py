@@ -298,7 +298,7 @@ async def product_list_enter(query: types.CallbackQuery,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         await query.answer()
-    except exceptions.TelegramBadRequest as error:
+    except NameError as error:
         logging.critical('No photo in requst from DB from product_list_enter function')
         logging.critical(f'{error}')
         await bot.send_message(

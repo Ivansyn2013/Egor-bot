@@ -15,6 +15,7 @@ from PIL import Image
 from io import BytesIO
 from keybords.other_kb import kb_answer_and_qusetion
 from aiogram.types.link_preview_options import LinkPreviewOptions
+from aiogram.enums.parse_mode import ParseMode
 
 
 async def upload_file_totg(user_id, photo):
@@ -34,7 +35,7 @@ async def upload_file_totg(user_id, photo):
 async def inline_handler(query: types.InlineQuery):
     user = query.from_user
     text = query.query
-    logging.info(f'Inline search:: user {user["username"]} search text {text}')
+    logging.info(f'Inline search:: user {user.username} search text {text}')
     if len(text) > 2:
         product_dict = await db_mysql_all_products()
         #filtered_product_list = await my_fuzzy_search(list(product_dict.keys()), text)
@@ -62,7 +63,7 @@ async def inline_handler(query: types.InlineQuery):
                 input_message_content=types.InputTextMessageContent(
                     message_text=mark_probe + get_answer_str(result).replace(product_name, ''),
                     #f"{url1} + \n + {get_answer_str(result)}",
-                    parse_mode='Markdown',
+                    parse_mode=ParseMode.MARKDOWN_V2,
                     link_preview_options=LinkPreviewOptions(
                         show_above_text=True
                     )
@@ -114,4 +115,5 @@ async def inline_handler(query: types.InlineQuery):
 def register_handlers_inline(dp: Dispatcher):
     #dp.message.register(get_user_inline_choseen)
     dp.inline_query.register(inline_handler)
+
 
