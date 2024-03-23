@@ -64,6 +64,7 @@ services:
       apk add --no-cache gcc musl-dev linux-headers
       mariadb-dev build-base python3-dev mariadb-connector-c-dev
       gcc libc-dev g++ libffi-dev libxml2 unixodbc-dev postgresql-dev
+      freetype-dev libjpeg-turbo-dev libpng-dev
       &&
       pip3 install -r req.txt &&
       python3 -u main.py
