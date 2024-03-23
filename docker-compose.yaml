@@ -40,7 +40,7 @@ services:
       - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
 
   bot:
-    image: python:3.9.16-alpine3.16
+    image: python:3.10-alpine3.19
     container_name: egor_bot
     volumes:
       - "./main.py:/app/main.py"
@@ -63,6 +63,7 @@ services:
       apk update &&
       apk add --no-cache gcc musl-dev linux-headers
       mariadb-dev build-base python3-dev mariadb-connector-c-dev
+      gcc libc-dev g++ libffi-dev libxml2 unixodbc-dev postgresql-dev
       &&
       pip3 install -r req.txt &&
       python3 -u main.py
