@@ -44,7 +44,7 @@ services:
     container_name: egor_bot
     volumes:
       - "./main.py:/app/main.py"
-      - "./Deploy/requirements.txt:/app/req.txt"
+      - "./requirements.txt:/app/req.txt"
       - "./create_obj.py:/app/create_obj.py"
       - "./keybords:/app/keybords"
       - "./acces_reader:/app/acces_reader"
