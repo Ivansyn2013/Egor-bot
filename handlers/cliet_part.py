@@ -9,6 +9,7 @@ from aiogram import types
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.enums.parse_mode import ParseMode
+from aiogram import exceptions as aio_except
 
 from acces_reader import db_mysql_request, db_mysql_all_products, \
     db_mysql_category_request
@@ -298,7 +299,7 @@ async def product_list_enter(query: types.CallbackQuery,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         await query.answer()
-    except aiogram.exceptions.TelegramBadRequest as error:
+    except aio_except.TelegramBadRequest as error:
         logging.critical('No photo in requst from DB from product_list_enter function')
         logging.critical(f'{error}')
         await bot.send_message(
