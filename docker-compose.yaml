@@ -7,18 +7,18 @@ services:
      - "80:80"
      - "443:443"
     volumes:
-      #- "./local_test/nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
-      - "./local_test/nginx.confd/nginx-del-admin.conf:/etc/nginx/conf.d/default.conf"
+      - "./local_test/nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
+     # - "./local_test/nginx.confd/nginx-del-admin.conf:/etc/nginx/conf.d/default.conf"
       - "/home/common_user/egor_bot/media:/www/media:ro"
       - "/home/common_user/egor_bot/bot_admin/bot_admin/static:/www/admin_static:ro" 
       - "./ssl/certbot/conf:/etc/letsencrypt"
       - "./ssl/certbot/www:/var/www/certbot"
+      - "./Deploy/html_errors:/usr/share/nginx/html"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'" 
     depends_on:
       - certbot
     networks:
-      egor_bot_network:
-        ipv4_address: 172.1.1.2
+      - egor_bot_network
     
   certbot:
     image: certbot/certbot
@@ -28,9 +28,8 @@ services:
       - "./ssl/certbot/conf:/etc/letsencrypt"
       - "./ssl/certbot/www:/var/www/certbot"
     networks:
-      egor_bot_network:
-        ipv4_address: 172.1.1.3
-   
+      - egor_bot_network
+
   db:
     image: mysql:8.0.32-debian
     container_name: db_mysql_egor
@@ -45,8 +44,7 @@ services:
     volumes:
       - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
     networks:
-      egor_bot_network:
-        ipv4_address: 172.1.1.4
+      - egor_bot_network
 
   bot:
     image: python:3.10-alpine3.19
@@ -79,8 +77,8 @@ services:
       python3 -u main.py
       "
     networks:
-      egor_bot_network:
-        ipv4_address: 172.1.1.5
+      - egor_bot_network
+
 networks:
   egor_bot_network:
     name: egor_bot_network
