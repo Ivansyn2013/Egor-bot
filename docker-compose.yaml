@@ -7,7 +7,8 @@ services:
      - "80:80"
      - "443:443"
     volumes:
-      - "./local_test/nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
+      #- "./local_test/nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "./local_test/nginx.confd/nginx-del-admin.conf:/etc/nginx/conf.d/default.conf"
       - "/home/common_user/egor_bot/media:/www/media:ro"
       - "/home/common_user/egor_bot/bot_admin/bot_admin/static:/www/admin_static:ro" 
       - "./data/certbot/conf:/etc/letsencrypt"
