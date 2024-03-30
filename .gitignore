@@ -21,3 +21,8 @@ test
 *output_1
 /acces_reader/output_1/
 */__pycache__/*
+/data
+/certbot/
+
+init_letincrypt.sh
+/init_letincrypt.sh
