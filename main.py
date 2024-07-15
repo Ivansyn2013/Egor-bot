@@ -17,10 +17,12 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 async def on_startup(dp):
     print('Бот загрузился')
-    print('Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
-    db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET)
+    print(
+        'Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
+        db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET
+        )
     print('Переменная DEBUG =' + str(DEBUG))
-    if  DEBUG == False:
+    if DEBUG == False:
         print('set.webhook')
         await bot.set_webhook(WEBHOOK_URL)
 
@@ -35,7 +37,7 @@ async def on_shutdown(dp):
     # Close DB connection (if used)
     await dp.storage.close()
     await dp.storage.wait_closed()
-    #logging.warning('Bye!')
+    # logging.warning('Bye!')
 
 
 from handlers import cliet_part, admin, other, inline_mode
@@ -73,6 +75,7 @@ async def main():
             host=WEBAPP_HOST,
             port=WEBAPP_PORT,
         )
+
 
 if __name__ == '__main__':
     asyncio.run(main())
