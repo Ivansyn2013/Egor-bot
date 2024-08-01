@@ -1,10 +1,12 @@
-from sqlalchemy import create_engine
+import logging
+
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import  sessionmaker
 from .subscribers import *
 from dotenv import load_dotenv
 import os
 
-load_dotenv(dotenv_path='../.env_test')#тут подумать как пробрасывать все настройки из мейн
+load_dotenv(dotenv_path='.env_test')#тут подумать как пробрасывать все настройки из мейн
 
 username = os.getenv("MYSQL_USER")
 password = os.getenv("MYSQL_PASSWORD")
@@ -17,6 +19,12 @@ print(db_url)
 
 engine = create_engine(db_url, echo=True)
 
+inspector = inspect(engine)
+table_names = inspector.get_table_names()
+table_tuple  = (Subscriber.__tablename__, UserRequest.__tablename__)
+if any(map(lambda x: x not in table_names, table_tuple)):
+    logging.debug('Tables not found in database and try to create')
+    Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
 db = Session()

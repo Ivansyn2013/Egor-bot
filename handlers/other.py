@@ -1,21 +1,21 @@
 import json
 import string
 
-from aiogram import types
 from aiogram import Dispatcher
-#from aiogram.dispatcher.filters import Text
-from aiogram.utils.markdown import hlink, link
-
-from create_obj import  bot
-from keybords import kb_client, kb_answer_and_qusetion
-from features.answer_and_question import STR_ANSWER_AND_QUESTION
 from aiogram import F
+from aiogram import types
 
+from create_obj import bot
+from features.answer_and_question import STR_ANSWER_AND_QUESTION
+from keybords import kb_client, kb_answer_and_qusetion
+
+# from aiogram.dispatcher.filters import Text
 
 filter_list = list(STR_ANSWER_AND_QUESTION.keys())
 filter_list.append('Узнать о боте')
 
-#@dp.message_handler()
+
+# @dp.message_handler()
 async def cenz_filter(message: types.Message):
     if {i.lower().translate(str.maketrans('', '', string.punctuation)) for i in
         message.text.split(' ')}.intersection(
@@ -33,7 +33,6 @@ async def answer_and_qusetion(message: types.Message):
         await message.reply(f'{STR_ANSWER_AND_QUESTION[message.text]}',
                             reply_markup=kb_answer_and_qusetion,
                             parse_mode='html')
-
 
 
 async def start_mes(message: types.Message):
@@ -55,33 +54,31 @@ async def start_mes(message: types.Message):
     print('Есть сообщение')
     print(message)
 
+
 # async def get_photo_mes(photo: types.Message.photo):
 #     print('есть фото')
 #     print(photo)
 
 
-
 async def donat_handler(message: types.Message):
+    '''Хендоер доната, пошлем клавиатуру со ссылками'''
+    from keybords import DONATE_KB
     await bot.send_message(message.from_user.id,
-                            text=link('Нажми сюда',
-                                      'https://donate.stream/jarantat',
-                                      ),
-                           parse_mode='Markdown',
-                           disable_web_page_preview=True)
-
+                           reply_markup=DONATE_KB)
 
 
 def register_handlers_other(dp: Dispatcher):
     dp.update.register(answer_and_qusetion, F.text(equals=filter_list,
-                                               ignore_case=True))
-
+                                                   ignore_case=True))
 
     dp.update.register(donat_handler, F.text(
-                                                    equals=['Поддержать '
-                                                            'проект'],
-                                               ignore_case=True))
+        equals=['Поддержать '
+                'проект'],
+        ignore_case=True))
 
     dp.update.register(start_mes)
+
+
 #    dp.register_message_handler(get_photo_mes)
 
 

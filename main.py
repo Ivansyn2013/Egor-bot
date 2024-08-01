@@ -1,11 +1,13 @@
 import asyncio
 import logging
 import os
+from aiogram import Router
 
 from colorama import Fore, Style
 from dotenv import load_dotenv
 
 from create_obj import dp, db_test_connect, bot
+from middleware.check_user import CheckUserMiddleware
 
 load_dotenv()
 
@@ -22,6 +24,8 @@ async def on_startup(dp):
         db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET
         )
     print('Переменная DEBUG =' + str(DEBUG))
+
+    #dp.outer_middleware.setup(CheckUserMiddleware())
     if DEBUG == False:
         print('set.webhook')
         await bot.set_webhook(WEBHOOK_URL)

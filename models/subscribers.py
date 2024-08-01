@@ -39,3 +39,7 @@ class UserRequest(Base):
     # Foreignkeys
     subscriber_id: Mapped[str] = mapped_column(ForeignKey("subscribers.id"), nullable=False)
     user: Mapped["Subscriber"] = relationship(back_populates="user_requests")
+
+
+def create_subscriber_table(engine):
+    Base.metadata.create_all(engine)
