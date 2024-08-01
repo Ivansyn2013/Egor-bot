@@ -38,8 +38,8 @@ services:
       - "3306"
     env_file:
       - ".env"
-    volumes:
-      - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
+    #volumes:
+      #- "./Deploy/db_dump:/docker-entrypoint-initdb.d"
     networks:
       - egor_bot_network
 
