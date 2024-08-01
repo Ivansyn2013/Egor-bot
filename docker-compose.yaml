@@ -63,7 +63,17 @@ services:
     volumes:
       - "/home/common_user/egor_bot/media:/app/media:ro"
     expose:
-      - "3000"
+      - "5001"
+    command:
+      - sh
+      - -c
+      - |
+        python3 manage.py makemigrations
+        python3 manage.py migrate --settings=bot_admin.develop_settings
+        python3 manage.py migrate main_app --database=bot_db --settings=bot_admin.develop_settings
+        python manage.py createsuperuser --noinput --username=q --email=q@q.q --password=q
+        gunicorn --workers=4  bot_admin.wsgi:application -b 0.0.0.0:5001
+
     networks:
       - egor_bot_network
 
