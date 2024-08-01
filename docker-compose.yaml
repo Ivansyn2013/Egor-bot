@@ -16,6 +16,8 @@ services:
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'" 
     depends_on:
       - certbot
+      - bot
+      - admin_bot
     networks:
       - egor_bot_network
     
@@ -65,6 +67,8 @@ services:
       - "/home/common_user/egor_bot/media:/app/media:ro"
     expose:
       - "5001"
+    depends_on:
+      - db
     command:
       - sh
       - -c
