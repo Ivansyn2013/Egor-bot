@@ -20,9 +20,10 @@ dp = Dispatcher()
 
 router = Router()
 #Middleware
-router.message.middleware(CheckUserMiddleware())
+router.message.outer_middleware(CheckUserMiddleware())
 
 dp.include_router(router)
+
 
 if os.getenv('DEBUG'):
     logging.basicConfig(

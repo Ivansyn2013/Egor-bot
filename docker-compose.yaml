@@ -7,13 +7,12 @@ services:
      - "80:80"
      - "443:443"
     volumes:
-      - "./local_test/nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
-     # - "./local_test/nginx.confd/nginx-del-admin.conf:/etc/nginx/conf.d/default.conf"
+      - "./Deploy/nginx.confd/nginx-https.conf:/etc/nginx/conf.d/default.conf"
       - "/home/common_user/egor_bot/media:/www/media:ro"
-      - "/home/common_user/egor_bot/bot_admin/bot_admin/static:/www/admin_static:ro" 
+      #- "/home/common_user/egor_bot/bot_admin/bot_admin/static:/www/admin_static:ro"
       - "./ssl/certbot/conf:/etc/letsencrypt"
       - "./ssl/certbot/www:/var/www/certbot"
-      - "./Deploy/html_errors:/usr/share/nginx/html"
+      #- "./Deploy/html_errors:/usr/share/nginx/html"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'" 
     depends_on:
       - certbot
@@ -36,25 +35,15 @@ services:
     expose:
       - "3306"
     env_file:
-      - ".env_test"
+      - ".env"
     volumes:
       - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
     networks:
       - egor_bot_network
 
   bot:
-    image: python:3.10-alpine3.19
+    build: .
     container_name: egor_bot
-    volumes:
-      - "./main.py:/app/main.py"
-      - "./requirements.txt:/app/req.txt"
-      - "./create_obj.py:/app/create_obj.py"
-      - "./keybords:/app/keybords"
-      - "./acces_reader:/app/acces_reader"
-      - "./handlers:/app/handlers"
-      - "./inline_butn:/app/inline_butn"
-      - "./features:/app/features"
-
     expose:
       - "5001"
     env_file:
@@ -62,16 +51,19 @@ services:
     working_dir: /app
     depends_on:
       - db
-    command: sh -c "
-      apk update &&
-      apk add --no-cache gcc musl-dev linux-headers
-      mariadb-dev build-base python3-dev mariadb-connector-c-dev
-      gcc libc-dev g++ libffi-dev libxml2 unixodbc-dev postgresql-dev
-      freetype-dev libjpeg-turbo-dev libpng-dev
-      &&
-      pip3 install -r req.txt &&
-      python3 -u main.py
-      "
+    networks:
+      - egor_bot_network
+
+  admin_bot:
+    build:
+      context: "${ADMIN_APP_PASS}"
+    working_dir: /app
+    env_file:
+      - ".env"
+    volumes:
+      - "/home/common_user/egor_bot/media:/app/media:ro"
+    expose:
+      - "3000"
     networks:
       - egor_bot_network
 

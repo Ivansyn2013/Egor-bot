@@ -22,16 +22,17 @@ class CheckUserMiddleware(BaseMiddleware):
         from models import Subscriber
         from models import db
 
-        self.user = db.query(Subscriber).one_or_none(user_id=user_id)
+        self.user = (db.query(Subscriber)
+                     .filter(Subscriber.user_id == user_id)
+                     .one_or_none())
         return self.user is not None
 
-    def add_user_to_db(self, user_id: int) -> None:
+    def add_user_to_db(self, user_id: int, user_name: str) -> None:
         """
-        TODO: add user_name
         """
         user = Subscriber(
             user_id=user_id,
-            user_name='',
+            user_name=user_name,
             last_use=datetime.utcnow(),
         )
         try:
@@ -59,7 +60,8 @@ class CheckUserMiddleware(BaseMiddleware):
         if self.is_user_in_db(user_id=event.from_user.id):
             self.update_user_in_db(user=self.user)
         else:
-            self.add_user_to_db(user_id=event.from_user.id)
+            self.add_user_to_db(user_id=event.from_user.id,
+                                user_name=event.from_user.first_name)
 
         data['user'] = self.user
         return await handler(event, data)
