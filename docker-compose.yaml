@@ -57,6 +57,7 @@ services:
   admin_bot:
     build:
       context: "${ADMIN_APP_PASS}"
+    container_name: admin_bot
     working_dir: /app
     env_file:
       - ".env"
