@@ -44,7 +44,7 @@ async def on_shutdown(dp):
     # logging.warning('Bye!')
 
 
-from handlers import cliet_part, admin, other, inline_mode
+from handlers import cliet_part, admin, other, inline_mode, tmp
 
 cliet_part.register_handlers_client(dp)
 
@@ -56,6 +56,7 @@ inline_mode.register_handlers_inline(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
+tmp.register_tmp_handlers(dp)
 
 async def main():
     if DEBUG:

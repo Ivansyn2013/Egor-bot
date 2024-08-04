@@ -1,18 +1,17 @@
 import json
 import string
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram import F
 from aiogram import types
 
 from create_obj import bot
-from features.answer_and_question import STR_ANSWER_AND_QUESTION
 from keybords import kb_client, kb_answer_and_qusetion
+from custom_filters import QuestionFilter
 
 # from aiogram.dispatcher.filters import Text
 
-filter_list = list(STR_ANSWER_AND_QUESTION.keys())
-filter_list.append('Узнать о боте')
+router = Router()
 
 
 # @dp.message_handler()
@@ -24,11 +23,11 @@ async def cenz_filter(message: types.Message):
         await message.delete()
 
 
-async def answer_and_qusetion(message: types.Message):
+@router.message(QuestionFilter())
+async def answer_and_question(message: types.Message):
+    from features.answer_and_question import STR_ANSWER_AND_QUESTION
     if message.text == 'Узнать о боте':
         await message.reply('Инфо', reply_markup=kb_answer_and_qusetion)
-    elif message.text == "Назад":
-        await message.reply(reply_markup=kb_client)
     if message.text in STR_ANSWER_AND_QUESTION.keys():
         await message.reply(f'{STR_ANSWER_AND_QUESTION[message.text]}',
                             reply_markup=kb_answer_and_qusetion,
@@ -51,36 +50,28 @@ async def start_mes(message: types.Message):
                            'можешь помочь в моем развитии, для этого есть удобная кнопка доната ;)'
                            '',
                            reply_markup=kb_client)
-    print('Есть сообщение')
-    print(message)
-
-
-# async def get_photo_mes(photo: types.Message.photo):
-#     print('есть фото')
-#     print(photo)
 
 
 async def donat_handler(message: types.Message):
     '''Хендоер доната, пошлем клавиатуру со ссылками'''
     from keybords import DONATE_KB
-    await bot.send_message(message.from_user.id,
-                           reply_markup=DONATE_KB)
+    await message.answer('Донат',
+                         reply_markup=DONATE_KB)
+
+async def back_handler(message: types.Message):
+    '''Gor back button'''
+    await message.reply('Назад', reply_markup=kb_client)
 
 
 def register_handlers_other(dp: Dispatcher):
-    dp.update.register(answer_and_qusetion, F.text(equals=filter_list,
-                                                   ignore_case=True))
+    dp.message.register(answer_and_question, F.text.lower() == 'узнать о боте')
 
-    dp.update.register(donat_handler, F.text(
-        equals=['Поддержать '
-                'проект'],
-        ignore_case=True))
+    dp.message.register(donat_handler, F.text.lower() == 'поддержать проект')
+    dp.message.register(back_handler, F.text.lower() == 'назад')
+    dp.include_router(router)
 
-    dp.update.register(start_mes)
-
-
-#    dp.register_message_handler(get_photo_mes)
+    # dp.message.register(start_mes) пустой
 
 
 if __name__ == "__main__":
-    print(filter_list)
+    print()

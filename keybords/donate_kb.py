@@ -1,6 +1,7 @@
 from aiogram import types
 import os
 
+
 button_data = {
     '100 руб.': os.getenv('PAY_LINK_100'),
     '200 руб.': os.getenv('PAY_LINK_200'),
@@ -11,8 +12,12 @@ button_data = {
     '5000 руб.': os.getenv('PAY_LINK_5000'),
 }
 
-DONATE_KB = types.InlineKeyboardMarkup(resize_keyboard=True)
-
-for text, link in button_data:
+buttons = []
+for text, link in button_data.items():
     button = types.InlineKeyboardButton(text=text, url=link)
-    DONATE_KB.add(button)
+    buttons.append(button)
+
+DONATE_KB = types.InlineKeyboardMarkup(
+    resize_keyboard=True,
+    inline_keyboard=[[buttons[x], buttons[x+1]] for x in range(0, len(buttons)-1,2)],
+)
