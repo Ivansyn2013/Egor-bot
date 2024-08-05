@@ -14,6 +14,7 @@ from features import get_answer_str
 IMG_LINK_FULL = os.getenv('IMG_LINK_FULL')
 IMG_LINK_THUMBNAILS = os.getenv('IMG_LINK_THUMBNAILS')
 
+logger = logging.getLogger(__name__)
 
 async def upload_file_totg(user_id, photo):
     """функция для рабоэты через кеш фото"""
@@ -33,7 +34,10 @@ async def upload_file_totg(user_id, photo):
 async def inline_handler(query: types.InlineQuery):
     user = query.from_user
     text = query.query
-    logging.info(f'Inline search:: user {user.username} search text {text}')
+    logger.info(f'Inline search:: user {user.username} search text {text}')
+    logger.debug(f'Ссылка на полные изображения: {IMG_LINK_FULL}')
+    logger.debug(f'Ссылка на минмиатюры : {IMG_LINK_THUMBNAILS}')
+
     if len(text) > 2:
         product_dict = await db_mysql_all_products()
         # filtered_product_list = await my_fuzzy_search(list(product_dict.keys()), text)
@@ -68,7 +72,9 @@ async def inline_handler(query: types.InlineQuery):
                 thumb_height=128,
 
             ))
-
+            logger.debug(f"Сформирована кнопка параметры ссылко :"
+                         f"\n url_thumb {url_thumb}"
+                         f"\n mark_probe {mark_probe}")
             # вариаент через фото
             # responce.append(
             #     types.InlineQueryResultPhoto(
