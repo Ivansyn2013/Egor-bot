@@ -1,13 +1,13 @@
 import asyncio
 import logging
 import os
-from aiogram import Router
 
 from colorama import Fore, Style
 from dotenv import load_dotenv
 
 from create_obj import dp, db_test_connect, bot
-from middleware.check_user import CheckUserMiddleware
+
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
@@ -16,18 +16,20 @@ WEBAPP_HOST = os.getenv("WEBAPP_HOST")
 WEBAPP_PORT = os.getenv("WEBAPP_PORT")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
+logger = logging.getLogger(__name__)
+
 
 async def on_startup(dp):
-    print('Бот загрузился')
-    print(
+    logger.info('Бот загрузился')
+    logger.info(
         'Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
         db_test_connect else (Fore.RED + Style.DIM + str(db_test_connect)), Fore.RESET
-        )
-    print('Переменная DEBUG =' + str(DEBUG))
+    )
+    logger.debug('Переменная DEBUG =' + str(DEBUG))
 
-    #dp.outer_middleware.setup(CheckUserMiddleware())
+    # dp.outer_middleware.setup(CheckUserMiddleware())
     if DEBUG == False:
-        print('set.webhook')
+        logger.debug('Webhook mode start set.webhook')
         await bot.set_webhook(WEBHOOK_URL)
 
     global kb_list
@@ -57,6 +59,7 @@ inline_mode.register_handlers_inline(dp)
 other.register_handlers_other(dp)
 
 tmp.register_tmp_handlers(dp)
+
 
 async def main():
     if DEBUG:
