@@ -40,6 +40,7 @@ services:
       - ".env"
     volumes:
       - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
+      - mysql_data:/home/common_user/egor_bot/bot_container_db
     networks:
       - egor_bot_network
 
@@ -85,6 +86,7 @@ services:
 
 volumes:
   admin_static:
+  mysql_data:
 
 networks:
   egor_bot_network:
