@@ -95,6 +95,8 @@ services:
       - fodmap_static:/app/static
     depends_on:
       - db
+    working_dir: /app
+    user: wagtail
     command:
       - python manage.py collectstatic --noinput --clear
       - set -xe; python manage.py migrate --noinput; gunicorn fodmap.wsgi:application
