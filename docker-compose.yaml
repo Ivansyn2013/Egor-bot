@@ -98,8 +98,11 @@ services:
     working_dir: /app
     user: wagtail
     command:
-      - python manage.py collectstatic --noinput --clear
-      - set -xe; python manage.py migrate --noinput; gunicorn fodmap.wsgi:application
+      - sh
+      - -c
+      - |
+       python3 manage.py collectstatic --noinput --clear
+       set -xe; python manage.py migrate --noinput; gunicorn fodmap.wsgi:application
     networks:
       - egor_bot_network
 
