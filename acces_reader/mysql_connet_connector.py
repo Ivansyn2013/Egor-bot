@@ -13,6 +13,8 @@ DB_USER = os.getenv('DB_USER')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
 DB_HOST = os.getenv('DB_HOST')
 
+logger = logging.getLogger(__name__)
+
 
 async def db_mysql_request(request: str):
     '''Function connecting to mysql db, search product by exact name of product
@@ -28,8 +30,8 @@ async def db_mysql_request(request: str):
                 password=BD_PASS,
                 database=MYSQL_DATABASE,
         ) as connection:
-            print(connection)
-            print("Соединение с базой")
+            logger.debug(connection)
+            logger.debug("Соединение с базой")
             request = request.replace("\'", '')
             select_req_string = fr'SELECT * FROM Common ' \
                                 fr'JOIN dose ON Common.id = dose.common_id ' \
@@ -60,12 +62,12 @@ async def db_mysql_request(request: str):
                 return str_dict
 
     except Error as e:
-        print('Это ошибка', end='')
-        print(e)
+        logger.error('Это ошибка')
+        logger.error(e)
         return None
 
 
-async def db_mysql_all_products() -> dict:
+async def db_mysql_all_products() -> dict or None:
     '''dict with all products from db or None if error
         :return: dict or None'''
 
@@ -90,12 +92,12 @@ async def db_mysql_all_products() -> dict:
                     return {x: y for y, x in answer_row}
 
     except Error as e:
-        print('Это ошибка из all+products')
-        print(e)
+        logger.error('Это ошибка из all+products')
+        logger.error(e)
         return None
 
 
-async def db_mysql_category_request() -> dict:
+async def db_mysql_category_request() -> dict or None:
     """
     connecting with db immutabel request
     :return: dict with category and id of products
@@ -115,7 +117,7 @@ async def db_mysql_category_request() -> dict:
                 password=BD_PASS,
                 database=MYSQL_DATABASE,
         ) as connection:
-            print('Соединение с базой из category_products')
+            logger.info('Соединение с базой из category_products')
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
@@ -133,8 +135,8 @@ async def db_mysql_category_request() -> dict:
                     return answer_dict
 
     except Error as e:
-        print('Это ошибка из category_products')
-        print(e)
+        logger.error('Это ошибка из category_products')
+        logger.error(e)
         return None
 
 
@@ -160,8 +162,8 @@ async def db_mysql_search_product_id(item) -> vars:
         return result[-1]
 
     except Error as e:
-        print('Это ошибка из db_mysql_search_product_id')
-        print(e)
+        logger.error('Это ошибка из db_mysql_search_product_id')
+        logger.error(e)
         return None
 
 
@@ -188,7 +190,7 @@ async def db_mysql_update_photo(id, photo):
         ) as connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(request_find_record)
-                if  cursor.fetchone() is not None:
+                if cursor.fetchone() is not None:
                     cursor.execute(request_update, request_data)
                 else:
                     cursor.execute(request_insert, request_data)
@@ -214,7 +216,7 @@ if __name__ == '__main__':
                     password=BD_PASS,
                     database=MYSQL_DATABASE,
             ) as connection:
-                print("Соединение с базой")
+                logger.info("Соединение с базой")
 
                 select_req_string = fr'SELECT * FROM Common ' \
                                     fr'LEFT JOIN jpeg_images on jpeg_images.common_id' \
@@ -227,9 +229,9 @@ if __name__ == '__main__':
 
                 with connection.cursor() as cr:
                     if cr.execute(find_record) == None:
-                        print(' request None')
+                        logger.info(' request None')
                         return None
-                   # print(cr.execute(select_req_string))
+                    # print(cr.execute(select_req_string))
 
                     req_all = cr.fetchall()
                     print(cr.column_names)
@@ -249,8 +251,8 @@ if __name__ == '__main__':
 
 
     res = mysql_connector_test()
-    #res.pop('Картинка')
-    #print(res.items())
-    #ph = open('../tmp/tmp.jpg', 'rb')
-    #print('\n\n\n\n\n')
+    # res.pop('Картинка')
+    # print(res.items())
+    # ph = open('../tmp/tmp.jpg', 'rb')
+    # print('\n\n\n\n\n')
     # print(*ph)

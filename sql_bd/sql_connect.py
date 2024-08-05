@@ -1,7 +1,9 @@
+import logging
 import sqlite3 as sq
 
 from create_obj import bot
 
+logger = logging.getLogger(__name__)
 
 def sql_start():
     global base, cur
@@ -9,7 +11,7 @@ def sql_start():
     cur = base.cursor()
     #cur.execute('DROP TABLE menu')
     if base:
-        print('Data base connected OK')
+        logger.info('Data base connected OK')
     cur.execute('CREATE TABLE IF NOT EXISTS menu'
                 '(img TEXT, '
                 'name TEXT, '
