@@ -13,6 +13,7 @@ services:
       - "./ssl/certbot/www:/var/www/certbot"
       #- "./Deploy/html_errors:/usr/share/nginx/html"
       - admin_static:/www/admin_static:ro
+      - fodmap_static:/www/fodmap_static:ro
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'" 
     depends_on:
       - certbot
@@ -84,9 +85,19 @@ services:
     networks:
       - egor_bot_network
 
+  fodmap:
+    build:
+      context: "${FODMAP_APP_PATH}"
+    container_name: fodmap
+    volumes:
+      - fodmap_static:/app/static
+    depends_on:
+      - db
+
 volumes:
   admin_static:
   mysql_data:
+  fodmap_static:
 
 networks:
   egor_bot_network:
