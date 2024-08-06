@@ -66,7 +66,7 @@ services:
     env_file:
       - ".env"
     volumes:
-      - "/home/common_user/egor_bot/media:/app/media:ro"
+      - "/home/common_user/egor_bot/media:/app/media"
       - admin_static:/app/static
     expose:
       - "5001"
@@ -89,14 +89,16 @@ services:
     build:
       context: "${FODMAP_APP_PATH}"
     container_name: fodmap
+    user: wagtail
     env_file:
       - ".env"
     volumes:
       - fodmap_static:/app/static
+    init: true
+    entrypoint: [ "/bin/sh", "-c", "chown -R wagtail:wagtail /app/static" ]
     depends_on:
       - db
     working_dir: /app
-    user: wagtail
     command:
       - sh
       - -c
