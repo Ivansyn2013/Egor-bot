@@ -30,7 +30,8 @@ def get_answer_str(response: dict):
             # изменени формата на marckdown
             answer = f'{answer}{dose_str[inx]} {one_srt_answer(r, inx)}\n '
         if r["Примечание"][0] is not None:
-            answer = answer + f'<i>{r["Примечание"][0]}</i>'
+            #answer = answer + f'<i>{r["Примечание"][0]}</i>'
+            answer = answer + f'{r["Примечание"][0]}'
 
         # эранирование
         ecran = {'-': '\-', '(': '\(', ')': '\)'}
