@@ -17,20 +17,27 @@ def one_srt_answer(response: dict, inx: int):
 
 def get_answer_str(response: dict):
     ''' get dick form db return str for message'''
+    # '🔴high-FODMAP🔴' 'high low medium'
     r = response
-    dose_str = ['Безопасная доза', 'Средняя доза', 'Высокая доза']
-
+    #dose_str = ['Безопасная доза', 'Средняя доза', 'Высокая доза']
+    doze_dict = {
+        '🟢low-FODMAP🟢': 'Безопасная доза',
+        '🔴high-FODMAP🔴': 'Высокая доза',
+        '🟡medium-FODMAP🟡': 'Средняя доза',
+              }
     answer = f'{r["Название продукта"][0]}\n' \
              f'{r["high low medium"][0]}\n\n'
+    h_l_m = r["high low medium"]
+
     if r == None:
         return None
     elif 4 > len(r['Доза']) > 0:
         for inx in range(len(list(r.values())[0])):
             # answer = f'<code>{answer}{dose_str[inx]} {one_srt_answer(r,inx)}\n </code>'
             # изменени формата на marckdown
-            answer = f'{answer}{dose_str[inx]} {one_srt_answer(r, inx)}\n '
+            #answer = f'{answer}{dose_str[inx]} {one_srt_answer(r, inx)}\n '
+            answer = f'{answer}{doze_dict[h_l_m[inx]]} {one_srt_answer(r, inx)}\n '
         if r["Примечание"][0] is not None:
-            #answer = answer + f'<i>{r["Примечание"][0]}</i>'
             answer = answer + f'{r["Примечание"][0]}'
 
         # эранирование
