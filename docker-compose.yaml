@@ -102,6 +102,8 @@ services:
       - sh
       - -c
       - |
+        chown -R wagtail:wagtail /app
+        chmod -R 755 /app
         python3 manage.py collectstatic --noinput --clear
         set -xe
         python manage.py migrate --noinput 
