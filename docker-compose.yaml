@@ -94,7 +94,6 @@ services:
       - ".env"
     volumes:
       - fodmap_static:/app/static
-    init: true
     entrypoint: [ "/bin/sh", "-c", "chown -R wagtail:wagtail /app/static" ]
     depends_on:
       - db
