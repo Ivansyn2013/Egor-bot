@@ -103,8 +103,10 @@ services:
       - sh
       - -c
       - |
-       python3 manage.py collectstatic --noinput --clear
-       set -xe; python manage.py migrate --noinput; gunicorn fodmap.wsgi:application
+        python3 manage.py collectstatic --noinput --clear
+        set -xe
+        python manage.py migrate --noinput 
+        gunicorn fodmap.wsgi:application
     networks:
       - egor_bot_network
 
