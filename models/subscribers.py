@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from uuid import uuid4
 
-from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Text, Integer
+from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Text, Integer, BigInteger
 from sqlalchemy.orm import Mapped, DeclarativeBase
 from sqlalchemy.orm import relationship, mapped_column
 
@@ -19,7 +19,7 @@ class Subscriber(Base):
     __tablename__ = 'subscribers'
 
     id: Mapped[str] = mapped_column(String(200), default=uuid_to_str, primary_key=True)
-    user_id: Mapped[int] = Column(Integer, unique=True, nullable=False)
+    user_id: Mapped[int] = Column(BigInteger, unique=True, nullable=False)
     user_name: Mapped[str] = Column(String(200), nullable=False)
     created_at: Mapped[datetime] = Column(DateTime, nullable=False, default=datetime.utcnow)
     last_use: Mapped[datetime] = Column(DateTime)
