@@ -35,6 +35,8 @@ services:
   db:
     image: mysql:8.0.32-debian
     container_name: db_mysql_egor
+    cap_add:
+      - SYS_NICE
     expose:
       - "3306"
     env_file:
@@ -101,9 +103,7 @@ services:
       - sh
       - -c
       - |
-        chown -R wagtail:wagtail /app/static
-        chown -R wagtail:wagtail /app
-        chmod -R 755 /app
+        
         python3 manage.py collectstatic --noinput --clear
         set -xe
         python3 manage.py migrate --noinput 
