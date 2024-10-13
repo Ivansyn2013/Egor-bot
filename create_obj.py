@@ -21,6 +21,8 @@ dp = Dispatcher()
 router = Router()
 #Middleware
 router.message.outer_middleware(CheckUserMiddleware())
+router.inline_query.outer_middleware(CheckUserMiddleware())
+router.callback_query.outer_middleware(CheckUserMiddleware())
 
 dp.include_router(router)
 

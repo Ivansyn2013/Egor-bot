@@ -54,9 +54,10 @@ class CheckUserMiddleware(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Message,
+            event: Any,
             data: Dict[str, Any]
     ) -> Any:
+
         if self.is_user_in_db(user_id=event.from_user.id):
             self.update_user_in_db(user=self.user)
         else:
