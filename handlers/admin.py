@@ -1,16 +1,21 @@
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-#from aiogram.filters import Text
 from aiogram.fsm.state import State, StatesGroup
 import os
 from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
+from tqdm import tqdm
 from features.author_messages import AUTHOR_MESSAGES
 from create_obj import bot
-from keybords import admin_kb_check
+from keybords import admin_kb_check, ADMIN_KB_SENDMESSAGE
 from acces_reader import db_mysql_search_product_id, db_mysql_update_photo
 from aiogram.filters import Command, Filter
 from aiogram import F
+from loguru import logger
+from models import Subscriber, db
+
+
 
 class MyFilter(Filter):
     def __init__(self, *args, **kwargs) -> None:
@@ -35,28 +40,73 @@ class FSMAdmin(StatesGroup):
     photo = State()
     data_check = State()
     update_photo_state = State()
+    #для отправки сообщений всем
+    send_message_state = State()
+    ready_to_send_mes_state = State()
+    chose_action_state = State()
 
-async def make_changes_command(message: types.Message):
-    print('moderator on')
-    await FSMAdmin.authorized.set()
+
+async def make_changes_command(message: types.Message, state: FSMContext):
+    """First method in bot admin state"""
+    logger.info(f'Moderator mode on by user {message.from_user.id}')
+    await state.set_state(FSMAdmin.authorized)
     await bot.send_message(message.from_user.id, 'Введи пароль:')
 
-    # await bot.send_message(message.from_user.id, 'Изменение базы данных',
-    #                        reply_markup=admin_kb.button_case_admin)
-    # #await message.delete()
+async def ready_to_send_mes_state(message: types.Message, state: FSMContext):
+    """For sendiing message for all subsribers. Work after admin auth"""
+    await state.set_state(FSMAdmin.send_message_state)
+    await message.reply('Готов к отправке. Следующее сообщение будет отправлено пользователям бота')
+
+
+
+async def send_message_to_subsribers(message: types.Message, state: FSMContext):
+    """For sendiing message for all subsribers. Work after admin auth"""
+    try:
+        subsribers = db.query(Subscriber.user_id)
+        count = subsribers.count()
+    except SQLAlchemyError:
+        logger.exception('Ошибка при получении списка подписчиков из базы')
+        await state.clear()
+        await message.reply("Произошла ошибка")
+        return
+
+    try:
+        for subsriber in subsribers:
+            progress_bar = tqdm(total=count,
+                                desc=f'Отправка пользователю {count - (count - 1)} из {count}',
+                                unit='пользователь')
+
+            await bot.send_message(subsriber.user_id, message.text)
+            progress_bar.update(1)
+            await message.answer(str(progress_bar), parse_mode=None)
+        progress_bar.close()
+
+    except Exception as e:
+        logger.error(f"Ошибка при отправке сообщений пользователям\n {e}" )
+        await state.clear()
+        await message.reply("Произошла ошибка")
+        progress_bar.close()
+
+        return
+
+    await state.clear()
+    await message.reply("Сообщения отправлены")
 
 async def check_author(message: types.Message, state: FSMContext):
-    print('author on')
+    """Next step after auth, check pass , work when first step set auth state"""
+    logger.info('author on')
     if message.text == AUTHOR_PASS:
-        await FSMAdmin.search_product_id.set()
-        await message.delete()
+        await state.set_state(FSMAdmin.chose_action_state)
         await bot.send_message(message.from_user.id,
-                               AUTHOR_MESSAGES['check_author'])
+                               AUTHOR_MESSAGES['check_author'],
+                               reply_markup=ADMIN_KB_SENDMESSAGE,
+                               )
     else:
-        await state.finish()
+        await state.clear()
         await bot.send_message(message.from_user.id, 'Неверный пароль. Выход')
 
 async def set_name(message: types.Message, state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         try:
             data['name'] = message.text
@@ -69,6 +119,7 @@ async def set_name(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id,
                                'Жду описание:')
 async def set_description(message: types.Message, state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         try:
             data['description'] = message.text
@@ -81,6 +132,7 @@ async def set_description(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id,
                                'Жду категорию:')
 async def set_category(message: types.Message, state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         try:
             data['category'] = message.text
@@ -94,6 +146,7 @@ async def set_category(message: types.Message, state: FSMContext):
                                'Жду fodmap:')
 
 async def set_fodmap(message: types.Message, state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         try:
             data['fodmap'] = message.text
@@ -107,7 +160,7 @@ async def set_fodmap(message: types.Message, state: FSMContext):
                            'Жду photo:')
 
 async def set_search_product_id(message: types.Message, state: FSMContext):
-
+    """Not work"""
     product_id = await db_mysql_search_product_id(message.text)
     if product_id:
         async with state.proxy() as data:
@@ -122,7 +175,7 @@ async def set_search_product_id(message: types.Message, state: FSMContext):
 
 
 async def set_photo(message: types.Message, state: FSMContext):
-    print('режим фото')
+    """Not work"""
     async with state.proxy() as data:
         try:
             await message.photo[-1].download(destination_file='tmp/tmp.jpg')
@@ -148,6 +201,7 @@ async def set_photo(message: types.Message, state: FSMContext):
     await FSMAdmin.update_photo_state.set()
 
 async def update_photo(message: types.Message, state: FSMContext):
+    """Not work"""
     with open('tmp/tmp.jpg', 'rb') as f:
         b_photo = f.read()
     async with state.proxy() as data:
@@ -161,45 +215,43 @@ async def update_photo(message: types.Message, state: FSMContext):
             await bot.send_message(data['chat_id'],
                              'Запрос к базе данных вернул ошибку')
             await state.finish()
+
 async def update_photo_cancel(state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         await bot.send_message(data['chat_id'],
                                'Отмена')
         await state.finish()
 
-
-# @dp.message_handler(commands='Загрузить', state=None)
 async def cm_start(message: types.Message):
+    """Not work"""
     await FSMAdmin.photo.set()
     await message.reply('Загрузи фото')
 
-
-# обработка ответа пользователя
-# @dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def load_photo(message: types.Message, state: FSMContext):
+    """Not work"""
     async with state.proxy() as data:
         data['photo'] = message.photo[0].file_id
         await FSMAdmin.next()
         await message.reply('Теперь введи название')
 
 
-# next FAM answer
-# @dp.message_handler(state=FSMAdmin.name)
 async def load_name(message: types.Message, state: FSMContext):
+    """Not work. Change proxy . It's absent in new version"""
     async with state.proxy() as data:
         data['name'] = message.text
     await FSMAdmin.next()
     await message.reply('Введи описание')
 
-# @dp.message_handler(state=FSMAdmin.description)
 async def load_description(message: types.Message, state: FSMContext):
+    """Not work """
     async with state.proxy() as data:
         data['description'] = message.text
     await FSMAdmin.next()
     await message.reply('Укажи цену')
 
-# @dp.message_handler(state=FSMAdmin.price)
 async def load_price(message: types.Message, state: FSMContext):
+    """Not work. Change proxy . It's absent in new version'"""
     async with state.proxy() as data:
         data['price'] = message.text
 
@@ -218,15 +270,19 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
         return
-    await state.finish()
+    await state.clear()
     await message.reply('Команда отмены: ok')
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.message.register(make_changes_command, Command('moderator'), MyFilter())
-    dp.message.register(check_author, F.state == FSMAdmin.authorized)
-    dp.message.register(set_name, F.state == FSMAdmin.name)
-    dp.message.register(set_category, F.state == FSMAdmin.category)
-    dp.message.register(set_description, F.state == FSMAdmin.description)
+    dp.message.register(make_changes_command, Command('moderator'))
+    dp.message.register(check_author, FSMAdmin.authorized)
+    dp.message.register(ready_to_send_mes_state,
+                        FSMAdmin.chose_action_state,
+                        F.text == "/Отправить сообщение" )
+    dp.message.register(send_message_to_subsribers, FSMAdmin.send_message_state)
+    dp.message.register(set_name, FSMAdmin.name)
+    dp.message.register(set_category, FSMAdmin.category)
+    dp.message.register(set_description, FSMAdmin.description)
     dp.message.register(set_search_product_id, F.state == FSMAdmin.search_product_id)
     dp.message.register(set_photo, F.state == FSMAdmin.photo, F.content == ['photo'])
     dp.message.register(set_fodmap, F.state == FSMAdmin.fodmap)

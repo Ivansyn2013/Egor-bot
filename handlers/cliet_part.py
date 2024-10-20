@@ -1,19 +1,19 @@
 import logging
 import typing
 
-from aiogram.filters import Command, CommandStart
 from aiogram import Dispatcher
 from aiogram import F
-from aiogram import exceptions
+from aiogram import exceptions as aio_except
 from aiogram import types
+from aiogram.enums.parse_mode import ParseMode
+from aiogram.filters import Command, CommandStart
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.enums.parse_mode import ParseMode
-from aiogram import exceptions as aio_except
 
 from acces_reader import db_mysql_request, db_mysql_all_products, \
     db_mysql_category_request
 from create_obj import bot
+from create_obj import router
 from features import get_answer_str
 from features import my_fuzzy_search
 from handlers.admin import MyFilter
@@ -22,7 +22,6 @@ from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import MyCallbackData
 from inline_butn.search_inline_but import inline_buttons_gen_category
 from keybords import kb_search, kb_client
-from create_obj import router
 
 kb_list = []
 
@@ -30,9 +29,9 @@ cd_data = MyCallbackData
 
 
 class FSMSearch(StatesGroup):
-    '''
+    """
     State for work with seacrh
-    '''
+    """
     fs_search = State()
     option_search = State()
     callback_search_state = State()
@@ -51,7 +50,6 @@ async def cancel_search_handler(message: types.Message, state: FSMContext):
                         reply_markup=kb_client)
 
 
-# @dp.message_handler(commands=['start', 'help'])
 async def command_start(message: types.Message):
     '''
     answer for none found questions
@@ -80,7 +78,7 @@ async def command_search(message: types.Message):
 
 
 # commands=['Искать']
-#@router.message(F.text == 'Поиска')
+# @router.message(F.text == 'Поиска')
 async def start_searching(message: types.Message, state: FSMContext):
     '''function start search and redirect message to {search_go_to_db} '''
     if message.text == 'Поиск':
@@ -105,7 +103,7 @@ async def callback_category(query: types.CallbackQuery,
 
     dict_for_kb = {}
     for row in query.message.reply_markup.inline_keyboard:
-        for but  in row:
+        for but in row:
             if query.data == but.callback_data:
                 category_product_in = but.text
                 break
@@ -127,7 +125,6 @@ async def callback_category(query: types.CallbackQuery,
 
     kb_list = await get_product_list_kb(dict_for_kb)
 
-
     await query.answer()
     await query.message.edit_text(f'{category_product_in}',
                                   reply_markup=kb_list[0])
@@ -148,7 +145,7 @@ async def search_go_to_db(message: types.Message, state: FSMContext):
         data['search_text'] = message.text
         await state.update_data(search_text=message.text)
         res = await db_mysql_request(data['search_text'])
-        #тут логер что ищет пользователь
+        # тут логер что ищет пользователь
         print(data['search_text'])
         await bot.send_message(message.from_user.id,
                                'Ищу')
@@ -245,9 +242,6 @@ async def search_callback(query: types.CallbackQuery,
         print(await state.get_state())
 
 
-# commands='Выйти из поиска'
-
-
 # @dp.message_handler(commands=['Авторизация'])
 async def command_author(message: types.Message):
     await bot.send_message(message.from_user.id, 'Кнопки с аторизацией')
@@ -293,9 +287,7 @@ async def product_list_enter(query: types.CallbackQuery,
         await bot.send_photo(
             query.from_user.id,
             photo=types.BufferedInputFile(image_data, filename=res['Название продукта'][0]),
-            # 'ПОка нет',
             caption=f'{get_answer_str(res)}',
-            #parse_mode='html',
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         await query.answer()
@@ -337,17 +329,13 @@ async def product_list_callback_back(query: types.CallbackQuery,
 
 @router.callback_query(MyCallbackData.filter(F.action == "category"))
 async def test_callback(query: types.CallbackQuery,
-                        #callback_data: MyCallbackData
+                        # callback_data: MyCallbackData
                         ):
-    #ss = callback_data
-    print('dsd')
     await query.answer('test query')
 
-def register_handlers_client(dp: Dispatcher):
 
-   #dp.message.register(command_start, Command('start', 'help'), MyFilter())
+def register_handlers_client(dp: Dispatcher):
     dp.message.register(command_author, Command('Авторизация'), MyFilter())
-    #dp.register_message_handler(start_searching, commands=['Искать', 'Поиск'])
     dp.message.register(start_searching, F.text(equals=['Поиск'],
                                                 ignore_case=True))
     dp.message.register(start_searching, F.text == 'Поиск')
@@ -355,34 +343,23 @@ def register_handlers_client(dp: Dispatcher):
     dp.message.register(command_product_list,
                         F.text == 'Список продуктов')
     dp.message.register(search_go_to_db, FSMSearch.fs_search)
-    #    dp.register_message_handler(search_options_db, state=FSMSearch.option_search)
     dp.message.register(
         cancel_search_handler,
         F.text.in_(['Выйти из поиска', 'Отмена']),
     )
-
     dp.message.register(cancel_search_handler,
                         F.text == 'отмена'
                         )
     dp.message.register(start_category_search,
                         F.text == 'Категории продуктов')
-
     dp.callback_query.register(search_callback,
-                        cd_data.filter(F.action == 'search'),
-                        )
-    # dp.register_message_handler(command_product_list, Text(equals='Список продуктов',
-    #                                                        ignore_case=True))
-
+                               cd_data.filter(F.action == 'search'),
+                               )
     dp.callback_query.register(product_list_callback_next,
-                        cd_data.filter(F.action == 'next'))
+                               cd_data.filter(F.action == 'next'))
     dp.callback_query.register(product_list_callback_back,
-                        cd_data.filter(F.action == 'back'))
+                               cd_data.filter(F.action == 'back'))
     dp.callback_query.register(product_list_enter,
-                        cd_data.filter(F.action == 'search_in'))
-
+                               cd_data.filter(F.action == 'search_in'))
     dp.callback_query.register(callback_category,
-                        MyCallbackData.filter(F.action == 'category'))
-
-    # dp.callback_query.register(test_callback,
-    #                            )
-
+                               MyCallbackData.filter(F.action == 'category'))

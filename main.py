@@ -58,7 +58,7 @@ inline_mode.register_handlers_inline(dp)
 # пустой хендлер должен быть последним
 other.register_handlers_other(dp)
 
-tmp.register_tmp_handlers(dp)
+#tmp.register_tmp_handlers(dp)
 
 
 async def main():
