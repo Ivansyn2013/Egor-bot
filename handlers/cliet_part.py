@@ -22,10 +22,12 @@ from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import MyCallbackData
 from inline_butn.search_inline_but import inline_buttons_gen_category
 from keybords import kb_search, kb_client, get_inline_search_kb
+from features.answer_and_question import MAIN_MENU_ANSWERS
 
 kb_list = []
 
 cd_data = MyCallbackData
+
 
 
 class FSMSearch(StatesGroup):
@@ -58,7 +60,7 @@ async def command_start(message: types.Message):
     '''
     try:
         await bot.send_message(message.from_user.id,
-                               'Привет!!!\n',
+                               MAIN_MENU_ANSWERS["Start message"],
                                reply_markup=kb_client)
         await message.delete()
     except:
@@ -149,7 +151,7 @@ async def search_go_to_db(message: types.Message, state: FSMContext):
         await state.update_data(search_text=message.text)
         res = await db_mysql_request(data['search_text'])
         # тут логер что ищет пользователь
-        print(data['search_text'])
+        #print(data['search_text'])
         await bot.send_message(message.from_user.id,
                                'Ищу')
         if res is None:
@@ -245,7 +247,6 @@ async def search_callback(query: types.CallbackQuery,
         print(await state.get_state())
 
 
-# @dp.message_handler(commands=['Авторизация'])
 async def command_author(message: types.Message):
     await bot.send_message(message.from_user.id, 'Кнопки с аторизацией')
 

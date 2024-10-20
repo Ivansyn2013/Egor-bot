@@ -8,7 +8,7 @@ b2 = types.KeyboardButton(text='Поиск')
 b3 = types.KeyboardButton(text='Категории продуктов')
 b4 = types.KeyboardButton(text='Список продуктов')
 b5 = types.KeyboardButton(text='Поддержать проект')
-b6 = types.KeyboardButton(text='Консультации')
+b6 = types.KeyboardButton(text='Консультации/Методичка')
 b7 = types.KeyboardButton(text='Обратная связь')
 
 
