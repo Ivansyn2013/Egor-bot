@@ -62,8 +62,8 @@ async def ready_to_send_mes_state(message: types.Message, state: FSMContext):
 async def send_message_to_subsribers(message: types.Message, state: FSMContext):
     """For sendiing message for all subsribers. Work after admin auth"""
     try:
-        subsribers = db.query(Subscriber.user_id)
-        count = subsribers.count()
+        subscribers = db.query(Subscriber.user_id)
+        count = subscribers.count()
     except SQLAlchemyError:
         logger.exception('Ошибка при получении списка подписчиков из базы')
         await state.clear()
@@ -71,14 +71,15 @@ async def send_message_to_subsribers(message: types.Message, state: FSMContext):
         return
 
     try:
-        for subsriber in subsribers:
+        i = 1
+        for subscriber in subscribers:
             progress_bar = tqdm(total=count,
-                                desc=f'Отправка пользователю {count - (count - 1)} из {count}',
+                                desc=f'Отправка пользователю {i} из {count}',
                                 unit='пользователь')
-
-            await bot.send_message(subsriber.user_id, message.text)
+            i += 1
+            await bot.send_message(subscriber.user_id, message.text)
             progress_bar.update(1)
-            await message.answer(str(progress_bar), parse_mode=None)
+            await message.edit_text(str(progress_bar), parse_mode=None)
         progress_bar.close()
 
     except Exception as e:
@@ -86,7 +87,6 @@ async def send_message_to_subsribers(message: types.Message, state: FSMContext):
         await state.clear()
         await message.reply("Произошла ошибка")
         progress_bar.close()
-
         return
 
     await state.clear()
