@@ -71,6 +71,7 @@ async def send_message_to_subsribers(message: types.Message, state: FSMContext):
         return
 
     try:
+        last_message = await message.answer('Начал отправку')
         i = 1
         for subscriber in subscribers:
             progress_bar = tqdm(total=count,
@@ -79,7 +80,7 @@ async def send_message_to_subsribers(message: types.Message, state: FSMContext):
             i += 1
             await bot.send_message(subscriber.user_id, message.text)
             progress_bar.update(1)
-            await message.edit_text(str(progress_bar), parse_mode=None)
+            await last_message.edit_text(str(progress_bar), parse_mode=None)
         progress_bar.close()
 
     except Exception as e:
