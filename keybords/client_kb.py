@@ -1,5 +1,6 @@
 #from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram import types
+from create_obj import bot
 
 #создание клавиатуры с кнопками
 b1 = types.KeyboardButton(text='Узнать о боте')
@@ -46,3 +47,13 @@ kb_search = types.ReplyKeyboardMarkup(
 
 #kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
 #kb_search.add(search_b2)
+
+def get_inline_search_kb(bot_info):
+    #KB and butons for search
+    #switch_inline_query_current_chat=bot_info.username,
+    search_button = types.InlineKeyboardButton(
+        text="Поиск",
+        switch_inline_query_current_chat='',
+    )
+    inline_search_kb = types.InlineKeyboardMarkup(inline_keyboard=[[search_button]])
+    return inline_search_kb
