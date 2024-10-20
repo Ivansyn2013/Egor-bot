@@ -21,7 +21,7 @@ from inline_butn import get_product_list_kb
 from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import MyCallbackData
 from inline_butn.search_inline_but import inline_buttons_gen_category
-from keybords import kb_search, kb_client
+from keybords import kb_search, kb_client, get_inline_search_kb
 
 kb_list = []
 
@@ -80,12 +80,15 @@ async def command_search(message: types.Message):
 # commands=['Искать']
 # @router.message(F.text == 'Поиска')
 async def start_searching(message: types.Message, state: FSMContext):
-    '''function start search and redirect message to {search_go_to_db} '''
-    if message.text == 'Поиск':
-        await state.set_state(FSMSearch.fs_search)
-        await message.reply('Введи название продукта',
-                            reply_markup=kb_search)
-
+    """function start search and redirect message to {search_go_to_db} """
+    # if message.text == 'Поиск':
+    #     await state.set_state(FSMSearch.fs_search)
+    #     await message.reply('Введи название продукта',
+    #                         reply_markup=kb_search)
+    bot_info = await bot.get_me()
+    await message.reply(text="Нажмите на кнопку ниже и вводите продукт в формате @ibs_doc_bot *продукт* Поиск "
+                             "начинается с 3 напечатанных букв",
+                        reply_markup=get_inline_search_kb(bot_info))
 
 # поиск по категориям
 async def start_category_search(message: types.Message):
