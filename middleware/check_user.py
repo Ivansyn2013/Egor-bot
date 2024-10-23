@@ -18,7 +18,7 @@ class CheckUserMiddleware(BaseMiddleware):
     def __init__(self) -> None:
         self.user = None
 
-    def is_user_in_db(self, user_id: int) -> bool:
+    async def is_user_in_db(self, user_id: int) -> bool:
         from models import Subscriber
         from models import db
 
@@ -27,7 +27,7 @@ class CheckUserMiddleware(BaseMiddleware):
                      .one_or_none())
         return self.user is not None
 
-    def add_user_to_db(self, user_id: int, user_name: str) -> None:
+    async def add_user_to_db(self, user_id: int, user_name: str) -> None:
         """
         """
         user = Subscriber(
@@ -43,7 +43,7 @@ class CheckUserMiddleware(BaseMiddleware):
             return None
         self.user = user
 
-    def update_user_in_db(self, user: Subscriber) -> None:
+    async def update_user_in_db(self, user: Subscriber) -> None:
         user.last_use = datetime.utcnow()
         try:
             db.merge(user)
@@ -58,10 +58,10 @@ class CheckUserMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
 
-        if self.is_user_in_db(user_id=event.from_user.id):
-            self.update_user_in_db(user=self.user)
+        if await self.is_user_in_db(user_id=event.from_user.id):
+            await self.update_user_in_db(user=self.user)
         else:
-            self.add_user_to_db(user_id=event.from_user.id,
+            await self.add_user_to_db(user_id=event.from_user.id,
                                 user_name=event.from_user.first_name)
 
         data['user'] = self.user
