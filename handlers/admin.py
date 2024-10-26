@@ -5,6 +5,7 @@ from aiogram.fsm.state import State, StatesGroup
 import os
 from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import with_parent
 from tqdm import tqdm
 from features.author_messages import AUTHOR_MESSAGES
 from create_obj import bot
@@ -13,7 +14,7 @@ from acces_reader import db_mysql_search_product_id, db_mysql_update_photo
 from aiogram.filters import Command, Filter
 from aiogram import F
 from loguru import logger
-from models import Subscriber, db
+from models import Subscriber, get_session
 
 
 
@@ -61,34 +62,35 @@ async def ready_to_send_mes_state(message: types.Message, state: FSMContext):
 
 async def send_message_to_subsribers(message: types.Message, state: FSMContext):
     """For sendiing message for all subsribers. Work after admin auth"""
-    try:
-        subscribers = db.query(Subscriber.user_id)
-        count = subscribers.count()
-    except SQLAlchemyError:
-        logger.exception('Ошибка при получении списка подписчиков из базы')
-        await state.clear()
-        await message.reply("Произошла ошибка")
-        return
+    async with get_session() as db:
+        try:
+            subscribers = db.query(Subscriber.user_id)
+            count = subscribers.count()
+        except SQLAlchemyError:
+            logger.exception('Ошибка при получении списка подписчиков из базы')
+            await state.clear()
+            await message.reply("Произошла ошибка")
+            return
 
-    try:
-        last_message = await message.answer('Начал отправку')
-        i = 1
-        for subscriber in subscribers:
-            progress_bar = tqdm(total=count,
-                                desc=f'Отправка пользователю {i} из {count}',
-                                unit='пользователь')
-            i += 1
-            await bot.send_message(subscriber.user_id, message.text)
-            progress_bar.update(1)
-            await last_message.edit_text(str(progress_bar), parse_mode=None)
-        progress_bar.close()
+        try:
+            last_message = await message.answer('Начал отправку')
+            i = 1
+            for subscriber in subscribers:
+                progress_bar = tqdm(total=count,
+                                    desc=f'Отправка пользователю {i} из {count}',
+                                    unit='пользователь')
+                i += 1
+                await bot.send_message(subscriber.user_id, message.text)
+                progress_bar.update(1)
+                await last_message.edit_text(str(progress_bar), parse_mode=None)
+            progress_bar.close()
 
-    except Exception as e:
-        logger.error(f"Ошибка при отправке сообщений пользователям\n {e}" )
-        await state.clear()
-        await message.reply("Произошла ошибка")
-        progress_bar.close()
-        return
+        except Exception as e:
+            logger.error(f"Ошибка при отправке сообщений пользователям\n {e}" )
+            await state.clear()
+            await message.reply("Произошла ошибка")
+            progress_bar.close()
+            return
 
     await state.clear()
     await message.reply("Сообщения отправлены")
