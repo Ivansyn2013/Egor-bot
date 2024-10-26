@@ -7,7 +7,7 @@ from aiogram.types import Message
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import Subscriber
-from models import db
+from models import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +20,11 @@ class CheckUserMiddleware(BaseMiddleware):
 
     async def is_user_in_db(self, user_id: int) -> bool:
         from models import Subscriber
-        from models import db
 
-        self.user = (db.query(Subscriber)
-                     .filter(Subscriber.user_id == user_id)
-                     .one_or_none())
+        async with get_session() as db:
+            self.user = (db.query(Subscriber)
+                         .filter(Subscriber.user_id == user_id)
+                         .one_or_none())
         return self.user is not None
 
     async def add_user_to_db(self, user_id: int, user_name: str) -> None:
@@ -35,21 +35,23 @@ class CheckUserMiddleware(BaseMiddleware):
             user_name=user_name,
             last_use=datetime.utcnow(),
         )
-        try:
-            db.add(user)
-            db.commit()
-        except SQLAlchemyError as e:
-            logger.error(f"Error in addintion user in db {e}")
-            return None
-        self.user = user
+        async with get_session() as db:
+            try:
+                db.add(user)
+                db.commit()
+            except SQLAlchemyError as e:
+                logger.error(f"Error in addintion user in db {e}")
+                return None
+            self.user = user
 
     async def update_user_in_db(self, user: Subscriber) -> None:
         user.last_use = datetime.utcnow()
-        try:
-            db.merge(user)
-            db.commit()
-        except SQLAlchemyError as e:
-            logger.error(f"Error in updating user in db {e}")
+        async with get_session() as db:
+            try:
+                db.merge(user)
+                db.commit()
+            except SQLAlchemyError as e:
+                logger.error(f"Error in updating user in db {e}")
 
     async def __call__(
             self,
