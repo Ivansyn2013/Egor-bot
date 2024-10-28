@@ -88,8 +88,7 @@ async def start_searching(message: types.Message, state: FSMContext):
     #     await message.reply('Введи название продукта',
     #                         reply_markup=kb_search)
     bot_info = await bot.get_me()
-    await message.reply(text="Нажмите на кнопку ниже и вводите продукт в формате @ibs_doc_bot *продукт* Поиск "
-                             "начинается с 3 напечатанных букв",
+    await message.reply(text=MAIN_MENU_ANSWERS['start_search'],
                         reply_markup=get_inline_search_kb(bot_info))
 
 # поиск по категориям
