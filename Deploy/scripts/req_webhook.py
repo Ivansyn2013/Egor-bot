@@ -43,7 +43,7 @@ class Webhooks_setttings():
             return 'Error File not Found'
         req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
 
-                            json={'url':f'{self.WEBHOOK_URL}{self.WEBHOOK_PATH}:{self.WEBHOOK_PORT}',
+                            json={'url':f'{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}',
                                 'certificate':f'{file}'},
                             )
         print(f'Webhook registering on this adress: {self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}')
