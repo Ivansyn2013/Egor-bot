@@ -33,7 +33,7 @@ class Webhooks_setttings():
     def registration(self):
         #нужно передать самоподписной сертификат
         try:
-            file = open(WEBHOOK_SSL_CERT,'rb')
+            file = open(self.WEBHOOK_SSL_CERT,'rb')
         except:
             return 'Error File not Found'
         req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
