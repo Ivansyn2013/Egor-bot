@@ -44,7 +44,8 @@ class Webhooks_setttings():
         req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
 
                             json={'url':f'{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}',
-                                'certificate':f'{file}'},
+                                #'certificate':f'{file}',  только для самоподдписных
+                                  },
                             )
         print(f'Webhook registering on this adress: {self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}')
         self._say_answer(req)
