@@ -41,7 +41,9 @@ async def on_startup():
         logger.info('Webhook mode start set.webhook')
         logger.info(f'Set webhook: {WEBHOOK_URL}:{WEBHOOK_PORT}{WEBHOOK_PATH}')
         await bot.set_webhook(f"{WEBHOOK_URL}:{WEBHOOK_PORT}{WEBHOOK_PATH}",
-                                  secret_token=WEBHOOK_SECRET)
+                              secret_token=WEBHOOK_SECRET,
+                              drop_pending_updates=True,
+                              )
 
 
 
