@@ -1,25 +1,34 @@
 import asyncio
 import logging
 import os
-
+from aiogram.types import FSInputFile
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 from colorama import Fore, Style
 from dotenv import load_dotenv
-
 from create_obj import dp, db_test_connect, bot
 
-logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
 DEBUG = os.getenv('DEBUG')
-WEBAPP_HOST = os.getenv("WEBAPP_HOST")
-WEBAPP_PORT = os.getenv("WEBAPP_PORT")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
+WEB_SERVER_HOST = os.getenv('WEB_SERVER_HOST')
+WEB_SERVER_PORT = os.getenv('WEB_SERVER_PORT')
+
+WEBHOOK_PATH = os.getenv('WEBHOOK_PATH')
+WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
+WEBHOOK_URL = os.getenv("WEBHOOK_HOST")
+WEBHOOK_PORT = os.getenv("WEBAPP_PORT")
+WEBHOOK_SSL_CERT = os.getenv('WEBHOOK_SSL_CERT')
+WEBHOOK_SSL_PRIV = os.getenv('WEBHOOK_SSL_PRIV')
 
 logger = logging.getLogger(__name__)
 
 
 async def on_startup(dp):
+    global kb_list
+
     logger.info('Бот загрузился')
     logger.info(
         'Соединение с базой', (Fore.GREEN + Style.DIM + str(db_test_connect)) if
@@ -28,22 +37,24 @@ async def on_startup(dp):
     logger.debug('Переменная DEBUG =' + str(DEBUG))
 
     # dp.outer_middleware.setup(CheckUserMiddleware())
-    if DEBUG == False:
-        logger.debug('Webhook mode start set.webhook')
-        await bot.set_webhook(WEBHOOK_URL)
+    if not DEBUG:
+        logger.info('Webhook mode start set.webhook')
+        await bot.set_webhook(f"{WEBHOOK_URL}{WEBHOOK_PATH}",
+                              certificate=FSInputFile(WEBHOOK_SSL_CERT),
+                              secret_token=WEBHOOK_SECRET)
 
-    global kb_list
+
 
 
 async def on_shutdown(dp):
-    # logging.warning('Shutting down..')
+    logging.info('Shutting down..')
     # insert code here to run it before shutdown
     # Remove webhook (not acceptable in some cases)
     await bot.delete_webhook()
     # Close DB connection (if used)
     await dp.storage.close()
     await dp.storage.wait_closed()
-    # logging.warning('Bye!')
+    logging.info('Bye!')
 
 
 from handlers import cliet_part, admin, other, inline_mode, tmp
@@ -62,6 +73,7 @@ other.register_handlers_other(dp)
 
 
 async def main():
+
     if DEBUG:
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
@@ -71,19 +83,23 @@ async def main():
             on_startup=on_startup,
             on_shutdown=on_shutdown
         )
-
     else:
+        logging.basicConfig(level=logging.INFO)
         logging.warning('Режим webhook')
-        start_webhook(
-            dispatcher=dp,
-            webhook_path='/',
-            on_startup=on_startup,
-            on_shutdown=on_shutdown,
-            skip_updates=True,
-            host=WEBAPP_HOST,
-            port=WEBAPP_PORT,
-        )
 
+        dp.startup.register(on_startup)
+
+        app = web.Application()
+
+        webhook_requests_handler = SimpleRequestHandler(
+            dispatcher=dp,
+            bot=bot,
+            secret_token=WEBHOOK_SECRET
+        )
+        webhook_requests_handler.register(app, path=WEBHOOK_PATH)
+        setup_application(app, dp, bot=bot)
+
+        web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 if __name__ == '__main__':
     asyncio.run(main())
