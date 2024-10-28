@@ -99,8 +99,13 @@ def main():
         )
         webhook_requests_handler.register(app, path=WEBHOOK_PATH)
         setup_application(app, dp, bot=bot)
-
-        web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+        try:
+            web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+        except Exception as e:
+            print(e)
+            print(f" host={WEB_SERVER_HOST}")
+            print(f" port{WEB_SERVER_PORT}")
+            print(f" path={WEBHOOK_PATH}")
 
 if __name__ == '__main__':
     main()
