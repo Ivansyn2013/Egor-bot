@@ -26,7 +26,7 @@ WEBHOOK_SSL_PRIV = os.getenv('WEBHOOK_SSL_PRIV')
 logger = logging.getLogger(__name__)
 
 
-async def on_startup(dp):
+async def on_startup():
     global kb_list
 
     logger.info('Бот загрузился')
@@ -46,7 +46,7 @@ async def on_startup(dp):
 
 
 
-async def on_shutdown(dp):
+async def on_shutdown():
     logging.info('Shutting down..')
     # insert code here to run it before shutdown
     # Remove webhook (not acceptable in some cases)
@@ -72,12 +72,12 @@ other.register_handlers_other(dp)
 #tmp.register_tmp_handlers(dp)
 
 
-async def main():
+def main():
 
     if DEBUG != "False":
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
-        await dp.start_polling(
+        dp.start_polling(
             bot,
             skip_updates=True,
             on_startup=on_startup,
@@ -88,6 +88,7 @@ async def main():
         logging.warning('Режим webhook')
 
         dp.startup.register(on_startup)
+        dp.shutdown.register(on_shutdown)
 
         app = web.Application()
 
