@@ -31,10 +31,8 @@ async def on_startup():
 
     logger.info('Бот загрузился')
     logger.info(
-        #'Соединение с базой', (f"{Fore.GREEN}{Style.DIM}{str(db_test_connect)}") if
-        #db_test_connect else (f"{Fore.RED}{Style.DIM}{str(db_test_connect)}"), Fore.RESET
-        'Соединение с базой', (f"{str(db_test_connect)}") if
-        db_test_connect else (f"{str(db_test_connect)}")
+        'Соединение с базой' + f"{Fore.GREEN}{Style.DIM}{str(db_test_connect)}" if
+        db_test_connect else  f"{Fore.RED}{Style.DIM}{str(db_test_connect)}", Fore.RESET
     )
     logger.debug('Переменная DEBUG =' + str(DEBUG))
 
