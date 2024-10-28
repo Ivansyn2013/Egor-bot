@@ -40,7 +40,7 @@ async def on_startup():
     if DEBUG == "False":
         logger.info('Webhook mode start set.webhook')
         logger.info(f'Set webhook: {WEBHOOK_URL}{WEBHOOK_PATH}')
-        await bot.set_webhook(f"{WEBHOOK_URL}{WEBHOOK_PATH}",
+        await bot.set_webhook(f"{WEBHOOK_URL}:{WEBHOOK_PORT}{WEBHOOK_PATH}",
                                   secret_token=WEBHOOK_SECRET)
 
 
