@@ -37,7 +37,7 @@ async def on_startup(dp):
     logger.debug('Переменная DEBUG =' + str(DEBUG))
 
     # dp.outer_middleware.setup(CheckUserMiddleware())
-    if not DEBUG:
+    if DEBUG == "False":
         logger.info('Webhook mode start set.webhook')
         await bot.set_webhook(f"{WEBHOOK_URL}{WEBHOOK_PATH}",
                               certificate=FSInputFile(WEBHOOK_SSL_CERT),
@@ -74,7 +74,7 @@ other.register_handlers_other(dp)
 
 async def main():
 
-    if DEBUG:
+    if DEBUG != "False":
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
         await dp.start_polling(
@@ -102,4 +102,4 @@ async def main():
         web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
