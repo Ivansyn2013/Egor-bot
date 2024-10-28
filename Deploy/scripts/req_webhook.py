@@ -3,8 +3,6 @@ from dotenv import load_dotenv
 import os
 import fire
 
-from main import WEBHOOK_SSL_CERT
-
 
 class Webhooks_setttings():
     """
