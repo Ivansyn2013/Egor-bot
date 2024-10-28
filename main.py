@@ -39,9 +39,9 @@ async def on_startup():
     # dp.outer_middleware.setup(CheckUserMiddleware())
     if DEBUG == "False":
         logger.info('Webhook mode start set.webhook')
+        logger.info(f'Set webhook: {WEBHOOK_URL}{WEBHOOK_PATH}')
         await bot.set_webhook(f"{WEBHOOK_URL}{WEBHOOK_PATH}",
                                   secret_token=WEBHOOK_SECRET)
-        logger.info(f'Set webhook: {WEBHOOK_URL}{WEBHOOK_PATH}')
 
 
 
