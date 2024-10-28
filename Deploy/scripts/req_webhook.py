@@ -21,7 +21,7 @@ class Webhooks_setttings():
     WEBHOOK_URL = os.getenv('WEBHOOK_URL')
     WEBHOOK_PORT = os.getenv('WEBHOOK_PORT')
     WEBHOOK_SSL_CERT = os.getenv('WEBHOOK_SSL_CERT') #*.pem
-
+    WEBHOOK_PATH = os.getenv('WEBHOOK_PATH')
     def _say_answer(self, req):
         print(f"URL: {req.url}")
         print("REQUEST...")
@@ -43,7 +43,7 @@ class Webhooks_setttings():
             return 'Error File not Found'
         req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
 
-                            json={'url':f'{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}',
+                            json={'url':f'{self.WEBHOOK_URL}{self.WEBHOOK_PATH}:{self.WEBHOOK_PORT}',
                                 'certificate':f'{file}'},
                             )
         self._say_answer(req)
