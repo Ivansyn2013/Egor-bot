@@ -46,7 +46,7 @@ class Webhooks_setttings():
                             json={'url':f'{self.WEBHOOK_URL}{self.WEBHOOK_PATH}:{self.WEBHOOK_PORT}',
                                 'certificate':f'{file}'},
                             )
-        print(f'Webhook registering on this adress: {self.WEBHOOK_URL}{self.WEBHOOK_PATH}:{self.WEBHOOK_PORT}')
+        print(f'Webhook registering on this adress: {self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}')
         self._say_answer(req)
 
     def get_webhook_info(self):
