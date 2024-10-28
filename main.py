@@ -13,7 +13,7 @@ load_dotenv()
 
 DEBUG = os.getenv('DEBUG')
 
-WEB_SERVER_HOST = "127.0.0.1"
+WEB_SERVER_HOST = os.getenv('WEB_SERVER_HOST')
 WEB_SERVER_PORT = os.getenv('WEB_SERVER_PORT')
 
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH')
@@ -40,9 +40,8 @@ async def on_startup():
     if DEBUG == "False":
         logger.info('Webhook mode start set.webhook')
         await bot.set_webhook(f"{WEBHOOK_URL}{WEBHOOK_PATH}",
-                              certificate=FSInputFile(WEBHOOK_SSL_CERT),
-                              secret_token=WEBHOOK_SECRET)
-
+                                  secret_token=WEBHOOK_SECRET)
+        logger.info(f'Set webhook: {WEBHOOK_URL}{WEBHOOK_PATH}')
 
 
 
