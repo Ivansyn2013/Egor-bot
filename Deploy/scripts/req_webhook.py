@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 import os
 import fire
 
+from main import WEBHOOK_SSL_CERT
+
+
 class Webhooks_setttings():
     """
 
@@ -17,8 +20,9 @@ class Webhooks_setttings():
 
     load_dotenv()
     BOTTOKEN = os.getenv('TOKEN')
-    HOST = os.getenv('HOST')
-    WEBHOOK_SSL_FILE = os.getenv('WEBHOOK_SSL_FILE') #*.pem
+    WEBHOOK_URL = os.getenv('WEBHOOK_URL')
+    WEBHOOK_PORT = os.getenv('WEBHOOK_PORT')
+    WEBHOOK_SSL_CERT = os.getenv('WEBHOOK_SSL_CERT') #*.pem
 
     def _say_answer(self, req):
         print("REQUEST...")
@@ -31,12 +35,12 @@ class Webhooks_setttings():
     def registration(self):
         #нужно передать самоподписной сертификат
         try:
-            file = open('/home/common_user/test_bot_app/test_bot_deploy/ssl/bot_pub.pem','rb')
+            file = open(WEBHOOK_SSL_CERT,'rb')
         except:
             return 'Error File not Found'
         req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
 
-                            json={'url':f'https://{self.HOST}',
+                            json={'url':f'https://{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}',
                                 'certificate':f'{file}'},
                             )
         self._say_answer(req)
