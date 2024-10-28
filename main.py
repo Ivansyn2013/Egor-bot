@@ -13,7 +13,7 @@ load_dotenv()
 
 DEBUG = os.getenv('DEBUG')
 
-WEB_SERVER_HOST = os.getenv('WEB_SERVER_HOST')
+WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = os.getenv('WEB_SERVER_PORT')
 
 WEBHOOK_PATH = os.getenv('WEBHOOK_PATH')
