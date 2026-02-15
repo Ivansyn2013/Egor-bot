@@ -3,17 +3,28 @@ import logging
 import re
 from datetime import datetime
 
-from aiogram import Bot, Dispatcher, html, F
+from aiogram import Bot, Dispatcher, F, html
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandObject, CommandStart
-from aiogram.types import Message, FSInputFile, URLInputFile, BufferedInputFile, LinkPreviewOptions
-from aiogram.utils.formatting import as_list, as_marked_section, Bold, as_key_value, HashTag
+from aiogram.types import (
+    BufferedInputFile,
+    FSInputFile,
+    LinkPreviewOptions,
+    Message,
+    URLInputFile,
+)
+from aiogram.utils.formatting import (
+    Bold,
+    HashTag,
+    as_key_value,
+    as_list,
+    as_marked_section,
+)
 from aiogram.utils.markdown import hide_link
 from aiogram.utils.media_group import MediaGroupBuilder
 
 
-
-#@dp.message(Command("advanced_example"))
+# @dp.message(Command("advanced_example"))
 async def cmd_advanced_example(message: Message):
     content = as_list(
         as_marked_section(
@@ -39,6 +50,7 @@ async def cmd_advanced_example(message: Message):
         sep="\n\n",
     )
     await message.answer(**content.as_kwargs())
+
 
 def register_tmp_handlers(dp: Dispatcher) -> None:
     dp.message.register(cmd_advanced_example, Command("advanced_example"))

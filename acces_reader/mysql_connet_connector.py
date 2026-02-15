@@ -2,45 +2,47 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from mysql.connector import connect, Error
+from mysql.connector import Error, connect
 
 load_dotenv()
 
-DEBUG = os.getenv('DEBUG')
-BD_PASS = os.getenv('DB_PASS')
-DB_PORT = os.getenv('DB_PORT')
-DB_USER = os.getenv('DB_USER')
-MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
-DB_HOST = os.getenv('DB_HOST')
+DEBUG = os.getenv("DEBUG")
+BD_PASS = os.getenv("DB_PASS")
+DB_PORT = os.getenv("DB_PORT")
+DB_USER = os.getenv("DB_USER")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+DB_HOST = os.getenv("DB_HOST")
 
 logger = logging.getLogger(__name__)
 
 
 async def db_mysql_request(request: str):
-    '''Function connecting to mysql db, search product by exact name of product
+    """Function connecting to mysql db, search product by exact name of product
      and return dict with all values for  product or  None if
     seach
-    result is empty or raise an Error'''
+    result is empty or raise an Error"""
 
     try:
         with connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                user=DB_USER,
-                password=BD_PASS,
-                database=MYSQL_DATABASE,
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=BD_PASS,
+            database=MYSQL_DATABASE,
         ) as connection:
             logger.debug(connection)
             logger.debug("Соединение с базой")
-            request = request.replace("\'", '')
-            select_req_string = fr'SELECT * FROM Common ' \
-                                fr'JOIN dose ON Common.id = dose.common_id ' \
-                                fr'JOIN fodmap ON Common.fodmap_id = fodmap.id ' \
-                                fr'JOIN Color ON dose.color_id = Color.id ' \
-                                fr'LEFT JOIN jpeg_images ON jpeg_images.common_id = Common.id ' \
-                                fr'WHERE `Название продукта` = "{request}"'
+            request = request.replace("'", "")
+            select_req_string = (
+                rf"SELECT * FROM Common "
+                rf"JOIN dose ON Common.id = dose.common_id "
+                rf"JOIN fodmap ON Common.fodmap_id = fodmap.id "
+                rf"JOIN Color ON dose.color_id = Color.id "
+                rf"LEFT JOIN jpeg_images ON jpeg_images.common_id = Common.id "
+                rf'WHERE `Название продукта` = "{request}"'
+            )
 
-            display_answer = fr'SELECT `Отображение` FROM Color'
+            display_answer = rf"SELECT `Отображение` FROM Color"
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
                 # это кортеж из табличных строк
@@ -58,30 +60,30 @@ async def db_mysql_request(request: str):
 
                 cr.execute(display_answer)
                 display = cr.fetchall()
-                str_dict['Отображение'] = display
+                str_dict["Отображение"] = display
                 return str_dict
 
     except Error as e:
-        logger.error('Это ошибка')
+        logger.error("Это ошибка")
         logger.error(e)
         return None
 
 
 async def db_mysql_all_products() -> dict or None:
-    '''dict with all products from db or None if error
-        :return: dict or None'''
+    """dict with all products from db or None if error
+    :return: dict or None"""
 
-    request = r'SELECT `id`, `Название продукта` FROM Common'
+    request = r"SELECT `id`, `Название продукта` FROM Common"
 
     try:
         with connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                user=DB_USER,
-                password=BD_PASS,
-                database=MYSQL_DATABASE
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=BD_PASS,
+            database=MYSQL_DATABASE,
         ) as connection:
-            logging.info('Соединение с базой из all_produts')
+            logging.info("Соединение с базой из all_produts")
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
@@ -92,7 +94,7 @@ async def db_mysql_all_products() -> dict or None:
                     return {x: y for y, x in answer_row}
 
     except Error as e:
-        logger.error('Это ошибка из all+products')
+        logger.error("Это ошибка из all+products")
         logger.error(e)
         return None
 
@@ -103,21 +105,23 @@ async def db_mysql_category_request() -> dict or None:
     :return: dict with category and id of products
     """
 
-    request = fr'SELECT Common.`id`, Category.`Название категории продукта` ' \
-              fr'FROM Category, Common ' \
-              fr'WHERE Category.`id` = Common.`product_cat_id`'
+    request = (
+        rf"SELECT Common.`id`, Category.`Название категории продукта` "
+        rf"FROM Category, Common "
+        rf"WHERE Category.`id` = Common.`product_cat_id`"
+    )
 
     answer_dict = {}
 
     try:
         with connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                user=DB_USER,
-                password=BD_PASS,
-                database=MYSQL_DATABASE,
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=BD_PASS,
+            database=MYSQL_DATABASE,
         ) as connection:
-            logger.info('Соединение с базой из category_products')
+            logger.info("Соединение с базой из category_products")
             with connection.cursor() as cr:
                 cr.execute(request)
                 answer_row = cr.fetchall()
@@ -135,26 +139,26 @@ async def db_mysql_category_request() -> dict or None:
                     return answer_dict
 
     except Error as e:
-        logger.error('Это ошибка из category_products')
+        logger.error("Это ошибка из category_products")
         logger.error(e)
         return None
 
 
 async def db_mysql_search_product_id(item) -> vars:
-    '''
+    """
 
     :param item: product name
     :return : id of product from db
-    '''
+    """
 
     request = rf"SELECT id FROM `Common`WHERE `Название продукта` =  '{item}'"
     try:
         with connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                user=DB_USER,
-                password=BD_PASS,
-                database=MYSQL_DATABASE,
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=BD_PASS,
+            database=MYSQL_DATABASE,
         ) as connection:
             with connection.cursor() as cr:
                 cr.execute(request)
@@ -162,31 +166,31 @@ async def db_mysql_search_product_id(item) -> vars:
         return result[-1]
 
     except Error as e:
-        logger.error('Это ошибка из db_mysql_search_product_id')
+        logger.error("Это ошибка из db_mysql_search_product_id")
         logger.error(e)
         return None
 
 
 async def db_mysql_update_photo(id, photo):
-    '''
+    """
     Update photo in DB
     :param id: product id
     :return : None
-    '''
+    """
 
     # надо писать запросы через коннектор именно так
-    request_update = '''UPDATE jpeg_images SET image = %s WHERE common_id = %s'''
-    request_insert = '''INSERT INTO jpeg_images(image, common_id) VALUES (%s, %s)'''
-    request_find_record = f'SELECT image FROM jpeg_images WHERE common_id = {id}'
+    request_update = """UPDATE jpeg_images SET image = %s WHERE common_id = %s"""
+    request_insert = """INSERT INTO jpeg_images(image, common_id) VALUES (%s, %s)"""
+    request_find_record = f"SELECT image FROM jpeg_images WHERE common_id = {id}"
     request_data = (photo, id)
 
     try:
         with connect(
-                host=DB_HOST,
-                port=DB_PORT,
-                user=DB_USER,
-                password=BD_PASS,
-                database=MYSQL_DATABASE,
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=BD_PASS,
+            database=MYSQL_DATABASE,
         ) as connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(request_find_record)
@@ -199,37 +203,39 @@ async def db_mysql_update_photo(id, photo):
                 return True
 
     except Error as e:
-        print('Это ошибка из db_mysql_update_photo')
+        print("Это ошибка из db_mysql_update_photo")
         print(e)
         return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     def mysql_connector_test(*id):
-        '''test func '''
+        """test func"""
         try:
             with connect(
-                    host=DB_HOST,
-                    port=DB_PORT,
-                    user=DB_USER,
-                    password=BD_PASS,
-                    database=MYSQL_DATABASE,
+                host=DB_HOST,
+                port=DB_PORT,
+                user=DB_USER,
+                password=BD_PASS,
+                database=MYSQL_DATABASE,
             ) as connection:
                 logger.info("Соединение с базой")
 
-                select_req_string = fr'SELECT * FROM Common ' \
-                                    fr'LEFT JOIN jpeg_images on jpeg_images.common_id' \
-                                    fr' = Common.id ' \
-                                    fr"WHERE `Название продукта` = 'Молоко'"
+                select_req_string = (
+                    rf"SELECT * FROM Common "
+                    rf"LEFT JOIN jpeg_images on jpeg_images.common_id"
+                    rf" = Common.id "
+                    rf"WHERE `Название продукта` = 'Молоко'"
+                )
 
-                find_record = '''SELECT image FROM jpeg_images
+                find_record = """SELECT image FROM jpeg_images
                                  WHERE common_id = (SELECT id FROM Common WHERE 
-                                 `Название продукта` = 'Молоко')'''
+                                 `Название продукта` = 'Молоко')"""
 
                 with connection.cursor() as cr:
                     if cr.execute(find_record) == None:
-                        logger.info(' request None')
+                        logger.info(" request None")
                         return None
                     # print(cr.execute(select_req_string))
 
@@ -245,10 +251,9 @@ if __name__ == '__main__':
                     return str_dict
 
         except Error as e:
-            print('Это ошибка ', end='')
+            print("Это ошибка ", end="")
             print(e)
             return None
-
 
     res = mysql_connector_test()
     # res.pop('Картинка')

@@ -1,0 +1,88 @@
+version: "3.9"
+services:
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: nginx
+    ports:
+     - "80:80"
+    volumes:
+      - admin_static:/www/admin_static:ro
+      - fodmap_static:/www/fodmap_static:ro
+    depends_on:
+      - bot
+      - admin_bot
+    networks:
+      - egor_bot_network
+
+  db:
+    image: mysql:8.0.32-debian
+    container_name: db_mysql_egor
+    cap_add:
+      - SYS_NICE
+    ports:
+      - "3306:3306"
+
+    env_file:
+      - ".env"
+    volumes:
+      - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
+      - mysql_data:/var/lib/mysql
+    networks:
+      - egor_bot_network
+
+  bot:
+    build: .
+    container_name: egor_bot
+    expose:
+      - "5000"
+    env_file:
+      - ".env"
+    volumes:
+      - "./ssl/certbot/conf:/etc/letsencrypt"
+      - "./ssl/certbot/www:/var/www/certbot"
+    working_dir: /app
+    depends_on:
+      - db
+    networks:
+      - egor_bot_network
+
+  admin_bot:
+    build:
+      context: "${ADMIN_APP_PASS}"
+    container_name: admin_bot
+    working_dir: /app
+    env_file:
+      - ".env"
+    volumes:
+      - "/home/common_user/egor_bot/media:/app/media"
+      - admin_static:/app/static
+    expose:
+      - "5001"
+    depends_on:
+      - db
+    command:
+      - sh
+      - -c
+      - |
+        python3 manage.py makemigrations
+        python3 manage.py migrate --settings=bot_admin.develop_settings
+        python3 manage.py migrate main_app --database=bot_db --settings=bot_admin.develop_settings
+        python manage.py createsuperuser --noinput --username=q --email=q@q.q --password=q
+        gunicorn --workers=4  bot_admin.wsgi:application -b 0.0.0.0:5001
+
+    networks:
+      - egor_bot_network
+
+volumes:
+  admin_static:
+  mysql_data:
+  fodmap_static:
+
+networks:
+  egor_bot_network:
+    name: egor_bot_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.1.1.0/24

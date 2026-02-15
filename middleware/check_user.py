@@ -1,13 +1,12 @@
 import logging
 from datetime import datetime
-from typing import Dict, Any, Callable, Awaitable
+from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import Subscriber
-from models import get_session
+from models import Subscriber, get_session
 
 logger = logging.getLogger(__name__)
 
@@ -22,14 +21,13 @@ class CheckUserMiddleware(BaseMiddleware):
         from models import Subscriber
 
         async with get_session() as db:
-            self.user = (db.query(Subscriber)
-                         .filter(Subscriber.user_id == user_id)
-                         .one_or_none())
+            self.user = (
+                db.query(Subscriber).filter(Subscriber.user_id == user_id).one_or_none()
+            )
         return self.user is not None
 
     async def add_user_to_db(self, user_id: int, user_name: str) -> None:
-        """
-        """
+        """ """
         user = Subscriber(
             user_id=user_id,
             user_name=user_name,
@@ -54,17 +52,18 @@ class CheckUserMiddleware(BaseMiddleware):
                 logger.error(f"Error in updating user in db {e}")
 
     async def __call__(
-            self,
-            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Any,
-            data: Dict[str, Any]
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Any,
+        data: Dict[str, Any],
     ) -> Any:
 
         if await self.is_user_in_db(user_id=event.from_user.id):
             await self.update_user_in_db(user=self.user)
         else:
-            await self.add_user_to_db(user_id=event.from_user.id,
-                                user_name=event.from_user.first_name)
+            await self.add_user_to_db(
+                user_id=event.from_user.id, user_name=event.from_user.first_name
+            )
 
-        data['user'] = self.user
+        data["user"] = self.user
         return await handler(event, data)

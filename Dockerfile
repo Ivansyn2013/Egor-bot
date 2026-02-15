@@ -1,10 +1,23 @@
 FROM python:3.10.14-slim
-COPY requirements.txt /app/requirements.txt
-RUN apt update
-RUN apt install libmariadb-dev gcc libc-dev g++ libffi-dev libxml2 unixodbc-dev -y
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libmariadb-dev \
+    gcc \
+    libc-dev \
+    g++ \
+    libffi-dev \
+    libxml2 \
+    unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-RUN pip install -r /app/requirements.txt
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /app
+# Copy the rest of the application
+COPY . .
+
 CMD ["python", "-u", "main.py"]

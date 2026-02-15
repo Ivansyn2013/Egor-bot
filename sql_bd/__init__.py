@@ -1,3 +1,1 @@
-from sql_bd.sql_connect import sql_start
-from sql_bd.sql_connect import sql_add_command
-from sql_bd.sql_connect import sql_read
+from sql_bd.sql_connect import sql_add_command, sql_read, sql_start

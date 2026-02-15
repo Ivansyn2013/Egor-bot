@@ -1,14 +1,15 @@
-from aiogram import types
 import os
 
+from aiogram import types
+
 button_data = {
-    '100 руб.': os.getenv('PAY_LINK_100'),
-    '200 руб.': os.getenv('PAY_LINK_200'),
-    '300 руб.': os.getenv('PAY_LINK_300'),
-    '400 руб.': os.getenv('PAY_LINK_400'),
-    '500 руб.': os.getenv('PAY_LINK_500'),
-    '1000 руб.': os.getenv('PAY_LINK_1000'),
-    '5000 руб.': os.getenv('PAY_LINK_5000'),
+    "100 руб.": os.getenv("PAY_LINK_100"),
+    "200 руб.": os.getenv("PAY_LINK_200"),
+    "300 руб.": os.getenv("PAY_LINK_300"),
+    "400 руб.": os.getenv("PAY_LINK_400"),
+    "500 руб.": os.getenv("PAY_LINK_500"),
+    "1000 руб.": os.getenv("PAY_LINK_1000"),
+    "5000 руб.": os.getenv("PAY_LINK_5000"),
 }
 
 buttons = []
@@ -18,5 +19,7 @@ for text, link in button_data.items():
 
 DONATE_KB = types.InlineKeyboardMarkup(
     resize_keyboard=True,
-    inline_keyboard=[[buttons[x], buttons[x+1]] for x in range(0, len(buttons)-1,2)],
+    inline_keyboard=[
+        [buttons[x], buttons[x + 1]] for x in range(0, len(buttons) - 1, 2)
+    ],
 )

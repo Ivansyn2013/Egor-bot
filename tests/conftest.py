@@ -1,13 +1,18 @@
+import os
+
+import pytest
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-import pytest
-import os
+
 from models.db_config import create_all, drop_all
+
 
 @pytest.fixture()
 def create_connecting():
-    load_dotenv(dotenv_path='../.env_test')  # тут подумать как пробрасывать все настройки из мейн
+    load_dotenv(
+        dotenv_path="../.env_test"
+    )  # тут подумать как пробрасывать все настройки из мейн
 
     username = os.getenv("MYSQL_USER")
     password = os.getenv("MYSQL_PASSWORD")
@@ -15,7 +20,9 @@ def create_connecting():
     port = os.getenv("DB_PORT")
     database_name = os.getenv("MYSQL_DATABASE")
 
-    db_url = f'mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}'
+    db_url = (
+        f"mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}"
+    )
     engine = create_engine(db_url)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -23,4 +30,3 @@ def create_connecting():
     yield session
     session.close()
     drop_all(engine)
-

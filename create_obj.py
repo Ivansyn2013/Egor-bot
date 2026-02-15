@@ -2,8 +2,7 @@ import logging
 import os
 import sys
 
-from aiogram import Bot
-from aiogram import Router
+from aiogram import Bot, Router
 from aiogram.dispatcher.dispatcher import Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage  # хранилище в ОП
@@ -19,7 +18,7 @@ bot = Bot(token=os.getenv("TOKEN"), parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 router = Router()
-#Middleware
+# Middleware
 router.message.outer_middleware(CheckUserMiddleware())
 router.inline_query.outer_middleware(CheckUserMiddleware())
 router.callback_query.outer_middleware(CheckUserMiddleware())
@@ -27,16 +26,14 @@ router.callback_query.outer_middleware(CheckUserMiddleware())
 dp.include_router(router)
 
 
-if os.getenv('DEBUG'):
+if os.getenv("DEBUG"):
     logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s %(levelname)s %(message)s"
-        )
+        level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s"
+    )
 else:
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s"
-        )
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
+    )
 
 my_logger = logging.getLogger(__name__)
 my_logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -47,15 +44,21 @@ my_logger.addFilter(CustomFilter())
 
 try:
     db_test_connect = connect(
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
-        user=os.getenv('MYSQL_USER'),
-        password=os.getenv('MYSQL_PASSWORD'),
-        database=os.getenv('MYSQL_DATABASE'),
-        ).is_connected()
-    logging.info('Connected to mysql database')
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MYSQL_DATABASE"),
+    ).is_connected()
+    logging.info("Connected to mysql database")
 
 except Exception as e:
-    print('Error in db connecting')
+
+    logging.error(f"Error in db connecting {e}\n"
+                  f"{os.getenv('DB_HOST')}" /
+                  f"{os.getenv('DB_PORT')}" /
+                  f"{os.getenv('MYSQL_USER')}" /
+                  f"{os.getenv('MYSQL_PASSWORD')}" /
+                  f"{os.getenv('MYSQL_DATABASE')}")
     print(e)
     db_test_connect = None

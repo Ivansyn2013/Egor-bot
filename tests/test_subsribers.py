@@ -1,5 +1,7 @@
 import pytest
+
 from models.subscribers import Subscriber
+
 
 def test_create_user(create_connecting):
     db = create_connecting

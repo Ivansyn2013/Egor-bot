@@ -1,5 +1,52 @@
+# Git
+.git
 .gitignore
-.idea
-venv
-*/__pycache__/*
-**/__pycache__/
+
+# Environments
+.env
+.env*
+.env_test
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+Lib/
+Scripts/
+pyvenv.cfg
+*.db
+*.sqlite3
+*.log
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Frontend
+node_modules/
+dist/
+frontend/foodmap_front/node_modules/
+frontend/foodmap_front/dist/
+
+# Project Specific
+Deploy/ssl/
+ssl/
+certbot/
+Deploy/db_dump/
+tmp/
+acces_reader/output_1/
+*output_1
+init_letincrypt.sh
+win_bot_start.bat
+2_5469803192629888397
+shell_scripts/
+test/

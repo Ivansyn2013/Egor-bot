@@ -1,10 +1,11 @@
+import os
+
+import fire
 import requests
 from dotenv import load_dotenv
-import os
-import fire
 
 
-class Webhooks_setttings():
+class Webhooks_setttings:
     """
 
     registration: for connect to api.telegrambot and set weebhook, sent self singet cert from
@@ -17,11 +18,11 @@ class Webhooks_setttings():
     """
 
     load_dotenv()
-    BOTTOKEN = os.getenv('TOKEN')
-    WEBHOOK_URL = os.getenv('WEBHOOK_URL')
-    WEBHOOK_PORT = os.getenv('WEBHOOK_PORT')
-    WEBHOOK_SSL_CERT = os.getenv('WEBHOOK_SSL_CERT') #*.pem
-    WEBHOOK_PATH = os.getenv('WEBHOOK_PATH')
+    BOTTOKEN = os.getenv("TOKEN")
+    WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+    WEBHOOK_PORT = os.getenv("WEBHOOK_PORT")
+    WEBHOOK_SSL_CERT = os.getenv("WEBHOOK_SSL_CERT")  # *.pem
+    WEBHOOK_PATH = os.getenv("WEBHOOK_PATH")
 
     def _say_answer(self, req):
         print(f"URL: {req.url}")
@@ -32,40 +33,44 @@ class Webhooks_setttings():
         print("RESPONSE...")
         print(req.text)
 
-    def registration(self, selfsinget='no', ssl_path=None):
-        #нужно передать самоподписной сертификат
-        if selfsinget.lower() == 'yes':
+    def registration(self, selfsinget="no", ssl_path=None):
+        # нужно передать самоподписной сертификат
+        if selfsinget.lower() == "yes":
             try:
                 if not ssl_path:
-                    file = open(self.WEBHOOK_SSL_CERT,'rb')
+                    file = open(self.WEBHOOK_SSL_CERT, "rb")
                 else:
-                    file = open(ssl_path,'rb')
+                    file = open(ssl_path, "rb")
 
             except FileNotFoundError:
-                return 'Error File not Found'
-        req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook',
-
-                            json={'url':f'{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}',
-                                #'certificate':f'{file}',  только для самоподдписных
-                                  },
-                            )
-        print(f'Webhook registering on this adress: {self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}')
+                return "Error File not Found"
+        req = requests.post(
+            f"https://api.telegram.org/bot{self.BOTTOKEN}/setWebhook",
+            json={
+                "url": f"{self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}",
+                #'certificate':f'{file}',  только для самоподдписных
+            },
+        )
+        print(
+            f"Webhook registering on this adress: {self.WEBHOOK_URL}:{self.WEBHOOK_PORT}{self.WEBHOOK_PATH}"
+        )
         self._say_answer(req)
 
     def get_webhook_info(self):
-        req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/getWebhookInfo',
-                            headers={'Content-Type': 'application/json'},
-                            )
+        req = requests.post(
+            f"https://api.telegram.org/bot{self.BOTTOKEN}/getWebhookInfo",
+            headers={"Content-Type": "application/json"},
+        )
         self._say_answer(req)
-
 
     def del_webhook(self):
-        req = requests.post(f'https://api.telegram.org/bot{self.BOTTOKEN}/deleteWebhook',
-                            headers={'Content-Type': 'application/json'},
-                            )
+        req = requests.post(
+            f"https://api.telegram.org/bot{self.BOTTOKEN}/deleteWebhook",
+            headers={"Content-Type": "application/json"},
+        )
 
         self._say_answer(req)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     fire.Fire(Webhooks_setttings)
