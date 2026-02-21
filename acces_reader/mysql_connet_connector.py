@@ -42,7 +42,7 @@ async def db_mysql_request(request: str):
                 rf'WHERE `Название продукта` = "{request}"'
             )
 
-            display_answer = rf"SELECT `Отображение` FROM Color"
+            display_answer = r"SELECT `Отображение` FROM Color"
             with connection.cursor() as cr:
                 cr.execute(select_req_string)
                 # это кортеж из табличных строк
@@ -106,9 +106,9 @@ async def db_mysql_category_request() -> dict or None:
     """
 
     request = (
-        rf"SELECT Common.`id`, Category.`Название категории продукта` "
-        rf"FROM Category, Common "
-        rf"WHERE Category.`id` = Common.`product_cat_id`"
+        r"SELECT Common.`id`, Category.`Название категории продукта` "
+        r"FROM Category, Common "
+        r"WHERE Category.`id` = Common.`product_cat_id`"
     )
 
     answer_dict = {}
@@ -223,10 +223,10 @@ if __name__ == "__main__":
                 logger.info("Соединение с базой")
 
                 select_req_string = (
-                    rf"SELECT * FROM Common "
-                    rf"LEFT JOIN jpeg_images on jpeg_images.common_id"
-                    rf" = Common.id "
-                    rf"WHERE `Название продукта` = 'Молоко'"
+                    r"SELECT * FROM Common "
+                    r"LEFT JOIN jpeg_images on jpeg_images.common_id"
+                    r" = Common.id "
+                    r"WHERE `Название продукта` = 'Молоко'"
                 )
 
                 find_record = """SELECT image FROM jpeg_images

@@ -1,5 +1,4 @@
 import logging
-import logging
 import os
 import asyncio
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, \
@@ -8,7 +7,6 @@ from aiohttp import web
 import aiohttp_cors
 from colorama import Fore, Style
 from dotenv import load_dotenv
-from lazy_object_proxy.utils import await_
 
 from create_obj import bot, db_test_connect, dp
 

@@ -1,9 +1,6 @@
-import json
-import string
 
 from aiogram import Dispatcher, F, Router, types
 
-from create_obj import bot
 from custom_filters import QuestionFilter
 from features.answer_and_question import MAIN_MENU_ANSWERS
 from keybords import kb_answer_and_qusetion, kb_client

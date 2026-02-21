@@ -7,7 +7,6 @@ from aiogram.fsm.state import State, StatesGroup
 from dotenv import load_dotenv
 from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import with_parent
 from tqdm import tqdm
 
 from acces_reader import db_mysql_search_product_id, db_mysql_update_photo
@@ -192,7 +191,7 @@ async def set_photo(message: types.Message, state: FSMContext):
             # data['photo'] = open('tmp/tmp.jpg', 'rb')
 
             data["chat_id"] = message.from_user.id
-            await bot.send_message(message.from_user.id, f"Что получилось:")
+            await bot.send_message(message.from_user.id, "Что получилось:")
             await bot.send_photo(
                 message.from_user.id, open("tmp/tmp.jpg", "rb"), data["product_id"]
             )

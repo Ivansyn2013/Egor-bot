@@ -2,7 +2,6 @@ import uuid
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from acces_reader.mysql_connet_connector import db_mysql_category_request
 
@@ -57,7 +56,7 @@ async def inline_buttons_gen_category() -> InlineKeyboardMarkup:
                 action="category",
                 bd_id=id,
                 kb_number=0,
-                button=f"",
+                button="",
             ).pack(),
         )
         buttons_list.append(b)

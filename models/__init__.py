@@ -19,7 +19,13 @@ host = os.getenv("DB_HOST")
 port = os.getenv("DB_PORT")
 database_name = os.getenv("MYSQL_DATABASE")
 
-db_url = f"mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}"
+# If we are in testing mode (pytest), or if we don't have MySQL credentials, use SQLite
+import sys
+if "pytest" in sys.modules or not (username and password and host and port and database_name):
+    db_url = "sqlite:///:memory:"
+else:
+    db_url = f"mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}"
+
 logger.debug(f"Строка подключеняи для алхимии: {db_url}")
 
 engine = create_engine(db_url, echo=True)

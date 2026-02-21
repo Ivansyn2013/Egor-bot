@@ -1,17 +1,8 @@
-import asyncio
-import logging
-import re
-from datetime import datetime
 
-from aiogram import Bot, Dispatcher, F, html
-from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandObject, CommandStart
+from aiogram import Dispatcher
+from aiogram.filters import Command
 from aiogram.types import (
-    BufferedInputFile,
-    FSInputFile,
-    LinkPreviewOptions,
     Message,
-    URLInputFile,
 )
 from aiogram.utils.formatting import (
     Bold,
@@ -20,8 +11,6 @@ from aiogram.utils.formatting import (
     as_list,
     as_marked_section,
 )
-from aiogram.utils.markdown import hide_link
-from aiogram.utils.media_group import MediaGroupBuilder
 
 
 # @dp.message(Command("advanced_example"))

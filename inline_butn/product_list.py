@@ -1,7 +1,6 @@
 import uuid
 
 from aiogram import types
-from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from acces_reader import db_mysql_all_products

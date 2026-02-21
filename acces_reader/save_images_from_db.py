@@ -1,4 +1,3 @@
-import logging
 import os
 
 from dotenv import load_dotenv
@@ -33,7 +32,7 @@ def get_images_and_save(dir_path):
             database=MYSQL_DATABASE,
         ) as connection:
             print("Connecting success")
-            execute_str = rf"SELECT `common_id`, `image` from jpeg_images;"
+            execute_str = r"SELECT `common_id`, `image` from jpeg_images;"
             with connection.cursor(execute_str) as cr:
                 cr.execute(execute_str)
                 images_list = cr.fetchall()

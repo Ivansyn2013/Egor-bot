@@ -1,7 +1,6 @@
 # from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram import types
 
-from create_obj import bot
 
 # создание клавиатуры с кнопками
 b1 = types.KeyboardButton(text="Узнать о боте")
