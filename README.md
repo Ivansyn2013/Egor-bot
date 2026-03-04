@@ -111,10 +111,18 @@ The following variables should be defined in your `.env` file:
 
 ## Tests
 The project uses `pytest`.
-To run tests:
-```bash
-pytest tests/
-```
+
+### Running Tests
+1. Install testing dependencies:
+   ```bash
+   pip install pytest pytest-asyncio mock
+   ```
+2. Run all tests:
+   ```bash
+   python3 -m pytest tests/
+   ```
+
+Note: The tests use an in-memory SQLite database by default if MySQL connection parameters are not provided in the environment or when running under `pytest`.
 
 ## TODO
 - [ ] Document specific API endpoints for the frontend.

@@ -21,10 +21,15 @@ database_name = os.getenv("MYSQL_DATABASE")
 
 # If we are in testing mode (pytest), or if we don't have MySQL credentials, use SQLite
 import sys
-if "pytest" in sys.modules or not (username and password and host and port and database_name):
+
+if "pytest" in sys.modules or not (
+    username and password and host and port and database_name
+):
     db_url = "sqlite:///:memory:"
 else:
-    db_url = f"mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}"
+    db_url = (
+        f"mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database_name}"
+    )
 
 logger.debug(f"Строка подключеняи для алхимии: {db_url}")
 

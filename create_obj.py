@@ -53,12 +53,13 @@ try:
     logging.info("Connected to mysql database")
 
 except Exception as e:
-
-    logging.error(f"Error in db connecting {e}\n"
-                  f"{os.getenv('DB_HOST')}" /
-                  f"{os.getenv('DB_PORT')}" /
-                  f"{os.getenv('MYSQL_USER')}" /
-                  f"{os.getenv('MYSQL_PASSWORD')}" /
-                  f"{os.getenv('MYSQL_DATABASE')}")
-    print(e)
+    logging.error(
+        f"Error in db connecting {e}\n"
+        f"{os.getenv('DB_HOST')} "
+        f"{os.getenv('DB_PORT')} "
+        f"{os.getenv('MYSQL_USER')} "
+        f"{os.getenv('MYSQL_PASSWORD')} "
+        f"{os.getenv('MYSQL_DATABASE')}"
+    )
+    logging.error(e)
     db_test_connect = None

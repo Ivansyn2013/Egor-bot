@@ -35,5 +35,5 @@ async def sql_read(message):
         await bot.send_photo(
             message.from_user.id,
             data[0],
-            f"{data[1]}\nОписание: " f"{data[2]}\n " f"Price:{data[3]}",
+            f"{data[1]}\nОписание: {data[2]}\n Price:{data[3]}",
         )

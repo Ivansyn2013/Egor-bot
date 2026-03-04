@@ -65,6 +65,15 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting/Formatting
+.ruff_cache/
+.mypy_cache/
+
 # Frontend (Node/React)
 node_modules/
 /frontend/foodmap_front/dist/

@@ -33,7 +33,6 @@ async def get_product_list_kb(all_product_dict: dict) -> types.InlineKeyboardBut
         but_list.append(b)
 
     if len(but_list) > 15:
-
         for index in range(0, len(but_list), 14):
             row = [
                 InlineKeyboardButton(

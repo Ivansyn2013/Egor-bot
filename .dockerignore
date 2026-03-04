@@ -30,12 +30,20 @@ pyvenv.cfg
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Frontend
 node_modules/
 dist/
 frontend/foodmap_front/node_modules/
 frontend/foodmap_front/dist/
+
+# Testing/Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
 
 # Project Specific
 Deploy/ssl/

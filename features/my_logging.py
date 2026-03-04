@@ -2,7 +2,6 @@ import logging
 
 
 class CustomFilter(logging.Filter):
-
     COLOR = {
         "DEBUG": "GREEN",
         "INFO": "GREEN",

@@ -30,7 +30,6 @@ ID = None
 
 
 class FSMAdmin(StatesGroup):
-
     authorized = State()
     name = State()
     description = State()
@@ -212,7 +211,6 @@ async def update_photo(message: types.Message, state: FSMContext):
     with open("tmp/tmp.jpg", "rb") as f:
         b_photo = f.read()
     async with state.proxy() as data:
-
         request = await db_mysql_update_photo(data["product_id"], b_photo)
         if request:
             await bot.send_message(data["chat_id"], "Картинка успешно добавлена")

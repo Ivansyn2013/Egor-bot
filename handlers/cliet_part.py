@@ -168,7 +168,7 @@ async def search_go_to_db(message: types.Message, state: FSMContext):
             #                                        n=5, cutoff=0.5)
             #
             search_option_list = await my_fuzzy_search(
-                list(search_dict.keys()), f'{data["search_text"]}'
+                list(search_dict.keys()), f"{data['search_text']}"
             )
 
             logging.debug(search_option_list)
@@ -203,7 +203,7 @@ async def search_go_to_db(message: types.Message, state: FSMContext):
 
             else:
                 image_data = types.BufferedInputFile(
-                    res["image"][0], filename=f'{data["search_text"]}.jpg'
+                    res["image"][0], filename=f"{data['search_text']}.jpg"
                 )
                 res.pop("image")
                 res.pop("Картинка")

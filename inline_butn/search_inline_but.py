@@ -7,7 +7,6 @@ from acces_reader.mysql_connet_connector import db_mysql_category_request
 
 
 class MyCallbackData(CallbackData, prefix="my"):
-
     button: str
     id: str
     bd_id: str
