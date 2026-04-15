@@ -12,6 +12,7 @@ from create_obj import dp, db_test_connect, bot
 load_dotenv()
 
 DEBUG = os.getenv('DEBUG')
+POLLING = os.getenv('POLLING')
 
 WEB_SERVER_HOST = os.getenv('WEB_SERVER_HOST')
 WEB_SERVER_PORT = os.getenv('WEB_SERVER_PORT')
@@ -75,7 +76,7 @@ other.register_handlers_other(dp)
 
 def main():
 
-    if DEBUG != "False":
+    if POLLING:
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
         dp.start_polling(
