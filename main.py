@@ -7,7 +7,7 @@ from aiohttp import web
 from colorama import Fore, Style
 from dotenv import load_dotenv
 from create_obj import dp, db_test_connect, bot
-
+from aiogram.methods import DeleteWebhook
 
 load_dotenv()
 
@@ -79,6 +79,7 @@ async def main():
     if POLLING:
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
+        await bot(DeleteWebhook(drop_pending_updates=True))
         await dp.start_polling(
             bot,
             skip_updates=True,
