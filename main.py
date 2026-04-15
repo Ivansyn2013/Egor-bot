@@ -74,12 +74,12 @@ other.register_handlers_other(dp)
 #tmp.register_tmp_handlers(dp)
 
 
-def main():
+async def main():
 
     if POLLING:
         logging.basicConfig(level=logging.DEBUG)
         logging.warning('Режим pollong')
-        dp.start_polling(
+        await dp.start_polling(
             bot,
             skip_updates=True,
             on_startup=on_startup,
@@ -110,4 +110,4 @@ def main():
             print(f" path={WEBHOOK_PATH}")
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
