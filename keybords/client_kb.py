@@ -1,6 +1,10 @@
 #from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from __future__ import annotations
+
+import os
+
 from aiogram import types
-from create_obj import bot
+from aiogram.types import WebAppInfo
 
 #создание клавиатуры с кнопками
 b1 = types.KeyboardButton(text='Узнать о боте')
@@ -48,6 +52,11 @@ kb_search = types.ReplyKeyboardMarkup(
 #kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
 #kb_search.add(search_b2)
 
+def get_webapp_url() -> str | None:
+    """Public HTTPS URL of the frontend Mini App."""
+    return os.getenv('WEBAPP_URL') or os.getenv('TELEGRAM_WEBAPP_URL') or None
+
+
 def get_inline_search_kb(bot_info):
     #KB and butons for search
     #switch_inline_query_current_chat=bot_info.username,
@@ -57,3 +66,16 @@ def get_inline_search_kb(bot_info):
     )
     inline_search_kb = types.InlineKeyboardMarkup(inline_keyboard=[[search_button]])
     return inline_search_kb
+
+
+def get_webapp_kb() -> types.InlineKeyboardMarkup | None:
+    """Inline keyboard that opens the shared SPA inside Telegram."""
+    webapp_url = get_webapp_url()
+    if not webapp_url:
+        return None
+
+    open_app = types.InlineKeyboardButton(
+        text='Открыть приложение',
+        web_app=WebAppInfo(url=webapp_url),
+    )
+    return types.InlineKeyboardMarkup(inline_keyboard=[[open_app]])

@@ -21,7 +21,7 @@ from inline_butn import get_product_list_kb
 from inline_butn import inline_button_gen
 from inline_butn.search_inline_but import MyCallbackData
 from inline_butn.search_inline_but import inline_buttons_gen_category
-from keybords import kb_search, kb_client, get_inline_search_kb
+from keybords import kb_search, kb_client, get_inline_search_kb, get_webapp_kb
 from features.answer_and_question import MAIN_MENU_ANSWERS
 
 kb_list = []
@@ -62,6 +62,13 @@ async def command_start(message: types.Message):
         await bot.send_message(message.from_user.id,
                                MAIN_MENU_ANSWERS["Start message"],
                                reply_markup=kb_client)
+        webapp_kb = get_webapp_kb()
+        if webapp_kb:
+            await bot.send_message(
+                message.from_user.id,
+                'Откройте веб-приложение для удобного поиска продуктов, рецептов и врачей:',
+                reply_markup=webapp_kb,
+            )
         await message.delete()
     except:
         await message.reply('Напишите боту в ЛС')
