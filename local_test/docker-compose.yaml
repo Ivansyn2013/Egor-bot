@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  nginx_test_1:
+    image: nginx:1.23-alpine
+    container_name: nginx_test_1
+    ports:
+     - "4444:4444"
+    volumes:
+      - "./nginx.confd/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "../acces_reader/output_1:/www/media:ro"
+        # create ssl certs
+        #https://core.telegram.org/bots/self-signed

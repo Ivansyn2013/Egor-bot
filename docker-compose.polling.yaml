@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+
+  db:
+    image: mysql:8.0.32-debian
+    container_name: db_mysql_egor
+    cap_add:
+      - SYS_NICE
+    expose:
+      - "3306"
+    env_file:
+      - ".env"
+    volumes:
+      - "./dump:/docker-entrypoint-initdb.d"
+      - mysql_data:/home/common_user/egor_bot/bot_container_db
+    networks:
+      - egor_bot_network
+
+  bot:
+    build: .
+    container_name: egor_bot
+    expose:
+      - "5000"
+    env_file:
+      - ".env"
+    volumes:
+      - "./ssl/certbot/conf:/etc/letsencrypt"
+      - "./ssl/certbot/www:/var/www/certbot"
+    working_dir: /app
+    depends_on:
+      - db
+    networks:
+      - egor_bot_network
+
+
+volumes:
+  mysql_data:
+
+networks:
+  egor_bot_network:
+    name: egor_bot_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.1.1.0/24

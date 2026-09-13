@@ -1,0 +1,105 @@
+version: "3.9"
+services:
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: nginx
+    ports:
+     - "80:80"
+     - "443:443"
+     - "8443:8443"
+    volumes:
+      - "./Deploy/nginx.confd/nginx-https.conf:/etc/nginx/conf.d/default.conf"
+      - "/home/common_user/egor_bot/media:/www/media:ro"
+      - "./ssl/certbot/conf:/etc/letsencrypt"
+      - "./ssl/certbot/www:/var/www/certbot"
+      #- "./Deploy/html_errors:/usr/share/nginx/html"
+      - admin_static:/www/admin_static:ro
+      - fodmap_static:/www/fodmap_static:ro
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'" 
+    depends_on:
+      - certbot
+      - bot
+      - admin_bot
+    networks:
+      - egor_bot_network
+    
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"    
+    volumes:
+      - "./ssl/certbot/conf:/etc/letsencrypt"
+      - "./ssl/certbot/www:/var/www/certbot"
+    networks:
+      - egor_bot_network
+
+  db:
+    image: mysql:8.0.32-debian
+    container_name: db_mysql_egor
+    cap_add:
+      - SYS_NICE
+    expose:
+      - "3306"
+    env_file:
+      - ".env"
+    volumes:
+      - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
+      - mysql_data:/home/common_user/egor_bot/bot_container_db
+    networks:
+      - egor_bot_network
+
+  admin_bot:
+    build:
+      context: "${ADMIN_APP_PASS}"
+    container_name: admin_bot
+    working_dir: /app
+    env_file:
+      - ".env"
+    volumes:
+      - "/home/common_user/egor_bot/media:/app/media"
+      - admin_static:/app/static
+    expose:
+      - "5001"
+    depends_on:
+      - db
+    command:
+      - sh
+      - -c
+      - |
+        python3 manage.py makemigrations
+        python3 manage.py migrate --settings=bot_admin.develop_settings
+        python3 manage.py migrate main_app --database=bot_db --settings=bot_admin.develop_settings
+        python manage.py createsuperuser --noinput --username=q --email=q@q.q --password=q
+        gunicorn --workers=4  bot_admin.wsgi:application -b 0.0.0.0:5001
+
+    networks:
+      - egor_bot_network
+
+  fodmap_front:
+    build:
+      context: "${FODMAP_APP_PATH}"
+    container_name: fodmap_frontend
+    env_file:
+      - ".env"
+    volumes:
+      - fodmap_static:/app/static
+    depends_on:
+      - db
+    working_dir: /app
+
+    networks:
+      - egor_bot_network
+
+volumes:
+  admin_static:
+  mysql_data:
+  fodmap_static:
+
+networks:
+  egor_bot_network:
+    name: egor_bot_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.1.1.0/24

@@ -1,15 +1,23 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+#from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from __future__ import annotations
+
+import os
+
+from aiogram import types
+from aiogram.types import WebAppInfo
 
 #создание клавиатуры с кнопками
-b1 =KeyboardButton('Узнать о боте')
-b2 =KeyboardButton('Поиск')
-b3 =KeyboardButton('Категории продуктов')
-b4 = KeyboardButton('Список продуктов')
-b5 = KeyboardButton('Поддержать проект')
+b1 = types.KeyboardButton(text='Узнать о боте')
+b2 = types.KeyboardButton(text='Поиск')
+b3 = types.KeyboardButton(text='Категории продуктов')
+b4 = types.KeyboardButton(text='Список продуктов')
+b5 = types.KeyboardButton(text='Поддержать проект')
+b6 = types.KeyboardButton(text='Консультации/Методичка')
+b7 = types.KeyboardButton(text='Обратная связь')
 
 
-search_b1 = KeyboardButton('Искать')
-search_b2 = KeyboardButton('Выйти из поиска')
+search_b1 = types.KeyboardButton(text='Искать')
+search_b2 = types.KeyboardButton(text='Выйти из поиска')
 #кнопки номера и локации(
 # b4 =KeyboardButton('Поделиться номером', request_contact=True)
 # b5 =KeyboardButton('Отправить где я', request_location=True)
@@ -17,16 +25,57 @@ search_b2 = KeyboardButton('Выйти из поиска')
 #настройки клавиатуры
 #one_time_keyboard=True для одноразового показа, но клавиатуру можно вернуть для
 # полного удаления нужно в хендлере прописать reply_markup=ReplyKeyboardRemove()
-kb_client = ReplyKeyboardMarkup(resize_keyboard=True,
-                                #one_time_keyboard=True
+kb_client = types.ReplyKeyboardMarkup(
+    keyboard=[[b1, b2],
+              [b3, b4],
+              [b5],
+              [b6, b7],
+              ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите способ подачи",
+
                                 )
 
-kb_search = ReplyKeyboardMarkup(resize_keyboard=True,
+kb_search = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [search_b1],
+        [search_b2],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите способ подачи"
                                 )
 
 #добавляет кнопку каждый раз с новой строки метод add
 #.insert добавляет кнопку если есть место рядом
 #.row(but1,but2...) медот добавляет все кнопки в строку
 
-kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
-kb_search.add(search_b2)
+#kb_client.add(b1).add(b2).add(b3).add(b4).add(b5)
+#kb_search.add(search_b2)
+
+def get_webapp_url() -> str | None:
+    """Public HTTPS URL of the frontend Mini App."""
+    return os.getenv('WEBAPP_URL') or os.getenv('TELEGRAM_WEBAPP_URL') or None
+
+
+def get_inline_search_kb(bot_info):
+    #KB and butons for search
+    #switch_inline_query_current_chat=bot_info.username,
+    search_button = types.InlineKeyboardButton(
+        text="Поиск",
+        switch_inline_query_current_chat='',
+    )
+    inline_search_kb = types.InlineKeyboardMarkup(inline_keyboard=[[search_button]])
+    return inline_search_kb
+
+
+def get_webapp_kb() -> types.InlineKeyboardMarkup | None:
+    """Inline keyboard that opens the shared SPA inside Telegram."""
+    webapp_url = get_webapp_url()
+    if not webapp_url:
+        return None
+
+    open_app = types.InlineKeyboardButton(
+        text='Открыть приложение',
+        web_app=WebAppInfo(url=webapp_url),
+    )
+    return types.InlineKeyboardMarkup(inline_keyboard=[[open_app]])

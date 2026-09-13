@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/track-edit.py"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/run-tests-on-stop.py",
+        "timeout": 300,
+        "loop_limit": 3
+      }
+    ]
+  }
+}
