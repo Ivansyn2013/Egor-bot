@@ -48,22 +48,6 @@ services:
     networks:
       - egor_bot_network
 
-  bot:
-    build: .
-    container_name: egor_bot
-    expose:
-      - "5000"
-    env_file:
-      - ".env"
-    volumes:
-      - "./ssl/certbot/conf:/etc/letsencrypt"
-      - "./ssl/certbot/www:/var/www/certbot"
-    working_dir: /app
-    depends_on:
-      - db
-    networks:
-      - egor_bot_network
-
   admin_bot:
     build:
       context: "${ADMIN_APP_PASS}"
@@ -91,11 +75,10 @@ services:
     networks:
       - egor_bot_network
 
-  fodmap:
+  fodmap_front:
     build:
       context: "${FODMAP_APP_PATH}"
-    container_name: fodmap
-    user: wagtail
+    container_name: fodmap_frontend
     env_file:
       - ".env"
     volumes:
@@ -103,15 +86,7 @@ services:
     depends_on:
       - db
     working_dir: /app
-    command:
-      - sh
-      - -c
-      - |
-        
-        python3 manage.py collectstatic --noinput --clear
-        set -xe
-        python3 manage.py migrate --noinput 
-        gunicorn fodmap.wsgi:application
+
     networks:
       - egor_bot_network
 
