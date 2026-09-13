@@ -1,0 +1,14 @@
+---
+description: After code changes, run tests and report failures to the user
+alwaysApply: true
+---
+
+# Verify code updates with tests
+
+When you create or modify application code in this repo:
+
+1. Run tests before finishing: `python -m pytest tests/ -q --tb=short`.
+2. If tests fail, tell the user clearly what failed and fix when possible.
+3. Do not claim the change is done while tests are failing.
+4. Skip full-suite runs only for docs-only / comment-only edits; say so briefly.
+5. A `stop` hook may also re-run tests and inject failures automatically — treat that output as authoritative and fix it.
