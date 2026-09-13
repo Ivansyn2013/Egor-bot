@@ -1,0 +1,65 @@
+version: "3.9"
+
+# Docker Compose для локальной разработки
+# Запускает только nginx и DB в контейнерах
+# Backend и Frontend запускаются вручную на хосте
+
+services:
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: nginx_dev
+    ports:
+      - "80:80"
+#      - "443:443"
+    volumes:
+      - ./local_test/nginx.confd/nginx-local-dev.conf:/etc/nginx/conf.d/default.conf:ro
+#      - ./ssl/certbot/conf:/etc/letsencrypt:ro
+#      - ./ssl/certbot/www:/var/www/certbot:ro
+    depends_on:
+      - db
+    networks:
+      - egor_bot_network
+    extra_hosts:
+      # Позволяет nginx из контейнера обращаться к сервисам на хосте
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0.32-debian
+    container_name: db_mysql_egor_dev
+    cap_add:
+      - SYS_NICE
+    ports:
+      - "32769:3306"
+    env_file:
+      - ".env"
+    volumes:
+      - "./Deploy/db_dump:/docker-entrypoint-initdb.d"
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - egor_bot_network
+    environment:
+      # Опциональные переопределения для dev окружения
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mysql_data_dev:
+    name: mysql_data_dev
+
+networks:
+  egor_bot_network:
+    name: egor_bot_network_dev
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.1.2.0/24
